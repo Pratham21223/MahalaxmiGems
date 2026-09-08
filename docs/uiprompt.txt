@@ -1,0 +1,658 @@
+# UI DESIGN IMPLEMENTATION INSTRUCTION
+
+You have been provided with a UI/design specification as an attached text file in the current task.
+
+IMPORTANT:
+The attached text file is the PRIMARY SOURCE OF TRUTH for the UI/design being implemented.
+
+Read the entire attached file before making any code changes.
+
+Your task is to take the UI/component/design described in that file and integrate it into the EXISTING gemstone e-commerce project.
+
+The master project requirements, architecture, business logic, and Phase 1 scope are already provided separately and should continue to be followed.
+
+Do NOT replace or modify those project-level requirements.
+
+======================================================================
+1. FIRST: READ THE ATTACHED UI FILE
+======================================================================
+
+Before coding:
+
+- Read the entire attached text file.
+- Understand all components included in it.
+- Understand the layout.
+- Understand styling.
+- Understand responsive behavior.
+- Understand interactions.
+- Understand state.
+- Understand dependencies.
+- Understand assets.
+- Understand which parts are demo/example content.
+- Understand how the example is intended to be integrated.
+
+Do not implement from only a small snippet.
+
+======================================================================
+2. INTEGRATE, DO NOT BLINDLY COPY
+======================================================================
+
+The attached file may have been written for another project or demo.
+
+Use its UI/design as the reference.
+
+Adapt it to the existing gemstone project.
+
+Replace unrelated:
+
+- logos
+- branding
+- demo product names
+- demo navigation
+- unrelated links
+- unrelated text
+- external demo destinations
+
+with the existing project's equivalents ONLY when those equivalents are already known.
+
+Do not invent replacements.
+
+If the correct replacement is unknown, ASK ME.
+
+======================================================================
+3. PRESERVE THE DESIGN
+======================================================================
+
+Your objective is high visual fidelity to the attached UI.
+
+Preserve:
+
+- layout
+- spacing
+- typography
+- colors
+- proportions
+- visual hierarchy
+- hover states
+- transitions
+- dropdown behavior
+- mobile behavior
+- animation
+- component composition
+
+Do not redesign the supplied UI according to your own preferences.
+
+Do not "improve" the design unless I explicitly ask you to.
+
+======================================================================
+4. DO NOT PREDICT
+======================================================================
+
+You are not allowed to silently guess missing requirements.
+
+Do NOT invent:
+
+- routes
+- page structure
+- business rules
+- API endpoints
+- product data
+- navigation destinations
+- additional sections
+- additional features
+- new pages
+
+If something required for implementation is unknown:
+
+ASK ME.
+
+======================================================================
+5. ROUTE RULE
+======================================================================
+
+Before implementing the UI:
+
+1. Inspect the existing React Router.
+2. Search the repository for the target page.
+3. Check the existing project context for an approved route.
+4. Check whether the attached file implies a route.
+
+If the route already exists:
+
+USE THE EXISTING ROUTE.
+
+If there is no confirmed route:
+
+ASK ME:
+
+"Which route should this UI use?"
+
+Do not invent a permanent route yourself.
+
+======================================================================
+6. PAGE RULE
+======================================================================
+
+Determine whether the attached UI represents:
+
+- an existing page
+- a new page
+- a reusable component
+- a section of an existing page
+
+Inspect the repository to determine where it belongs.
+
+If the destination is unclear:
+
+ASK ME.
+
+Do not create unrelated pages.
+
+======================================================================
+7. DESIGN PROMPT RULE
+======================================================================
+
+The attached file IS the design prompt for this task.
+
+Do not ask me for another design prompt unless the file itself is insufficient to determine a critical visual requirement.
+
+If the attached file leaves an important design decision unresolved:
+
+ASK ME rather than inventing one.
+
+======================================================================
+8. EXISTING PROJECT FIRST
+======================================================================
+
+Before creating files:
+
+Inspect:
+
+- current directory structure
+- existing routes
+- existing pages
+- existing components
+- existing shadcn/ui components
+- Tailwind configuration
+- design tokens
+- existing API/service layer
+- TypeScript types
+
+Reuse existing components when appropriate.
+
+Do not create duplicate UI primitives.
+
+======================================================================
+9. SHADCN / TAILWIND
+======================================================================
+
+The existing project uses:
+
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+
+Use the existing project structure.
+
+If a component from the attached file can use an existing shadcn component:
+
+REUSE IT.
+
+Do not install a new UI framework.
+
+Do not introduce another CSS framework.
+
+Do not restructure the whole project.
+
+======================================================================
+10. DEPENDENCIES
+======================================================================
+
+Analyze every dependency used by the attached UI file.
+
+If a dependency is already installed:
+
+reuse it.
+
+If it is required but not installed:
+
+determine whether it is genuinely necessary.
+
+If installation is a straightforward implementation detail:
+
+you may install it.
+
+If adding it would materially affect the architecture or project:
+
+ASK ME first.
+
+Do not add unnecessary dependencies.
+
+======================================================================
+11. ASSETS
+======================================================================
+
+The current gemstone project does NOT use real gemstone product images yet.
+
+I will add actual images manually later.
+
+Therefore:
+
+DO NOT:
+
+- scrape images
+- download Navratan images
+- use competitor images
+- search the internet for real gemstone photos
+- generate gemstone photography
+
+Use the project's existing placeholder strategy.
+
+If the supplied UI contains unrelated example images:
+
+replace them with appropriate placeholders.
+
+======================================================================
+12. PRODUCT IMAGE REQUIREMENT
+======================================================================
+
+For product-related UI:
+
+support 3–4 images per product.
+
+The visual implementation should support:
+
+- primary image
+- thumbnails
+- previous/next
+- mobile interaction
+- fallback image
+- loading state where appropriate
+
+Every image must have meaningful alt text.
+
+Do not reduce the product architecture to one image.
+
+======================================================================
+13. EXTERNAL BRANDING
+======================================================================
+
+If the attached file contains branding or assets from another product/site:
+
+do not copy those into the gemstone application.
+
+Examples:
+
+- external logos
+- unrelated brand names
+- demo company names
+- competitor branding
+
+Replace them with the project's existing branding when known.
+
+If branding is not yet defined:
+
+ASK ME.
+
+======================================================================
+14. API / DATA INTEGRATION
+======================================================================
+
+Do not invent API endpoints.
+
+First inspect the existing backend/service layer.
+
+If the attached UI needs data:
+
+determine whether the required API already exists.
+
+If it exists:
+
+use it.
+
+If it does not exist:
+
+ASK ME before creating a new endpoint if the endpoint affects product architecture.
+
+Do not assume routes such as:
+
+/api/products/:id
+
+exist unless confirmed.
+
+======================================================================
+15. BUSINESS DATA
+======================================================================
+
+Never invent real business data.
+
+Do not invent:
+
+- gemstone prices
+- certificate numbers
+- laboratory names
+- customer reviews
+- ratings
+- company statistics
+- shipping guarantees
+- product origins
+- gemstone specifications
+
+Use existing database/demo data.
+
+If temporary placeholder content is required, clearly keep it as placeholder/demo content.
+
+======================================================================
+16. PRICE STATE
+======================================================================
+
+The gemstone store supports:
+
+PUBLIC_PRICE
+
+and:
+
+CONTACT_FOR_PRICE
+
+For public-price products:
+
+show the purchase UI required by the provided design.
+
+For contact-price products:
+
+show enquiry/contact/WhatsApp behavior where required.
+
+Do not invent a price.
+
+If the attached design does not make the contact-price behavior clear:
+
+ASK ME.
+
+======================================================================
+17. RESPONSIVE BEHAVIOR
+======================================================================
+
+Preserve the responsive behavior in the attached file.
+
+Test:
+
+- mobile
+- tablet
+- desktop
+
+Pay special attention to:
+
+- navigation
+- dropdowns
+- mobile menu
+- product gallery
+- cards
+- forms
+- grids
+- spacing
+- typography
+
+Do not simply shrink desktop UI.
+
+======================================================================
+18. ACCESSIBILITY
+======================================================================
+
+Preserve and improve accessibility.
+
+Use:
+
+- semantic HTML
+- accessible buttons
+- accessible links
+- labels
+- alt text
+- keyboard behavior
+- focus states
+- aria labels where necessary
+
+If the supplied component already implements:
+
+- Escape handling
+- click-outside behavior
+- body scroll locking
+- mobile menu state
+
+preserve those behaviors.
+
+======================================================================
+19. INTERACTIONS
+======================================================================
+
+Implement the interactions explicitly present in the attached file.
+
+Examples:
+
+- dropdowns
+- mobile menus
+- hover effects
+- animations
+- carousels
+- image navigation
+- modals
+- tabs
+- accordions
+
+Do not add new interactions unless the existing project requirements require them.
+
+======================================================================
+20. ANIMATION
+======================================================================
+
+Preserve animations from the attached design where appropriate.
+
+Do not replace them with unrelated animation systems.
+
+Keep animations performant and responsive.
+
+======================================================================
+21. COMPONENT REUSE
+======================================================================
+
+Before creating a new component:
+
+SEARCH THE REPOSITORY.
+
+If an equivalent component exists:
+
+reuse it.
+
+Create a new component when the attached UI genuinely requires one.
+
+Do not create unnecessary abstractions.
+
+======================================================================
+22. NO UNRELATED CHANGES
+======================================================================
+
+This task is ONLY about integrating the attached UI/design.
+
+Do not:
+
+- rewrite unrelated pages
+- rewrite the backend
+- change the database architecture
+- change authentication
+- change payment logic
+- add astrology functionality
+- add referral functionality
+- add AI functionality
+- redesign unrelated components
+
+unless explicitly required by the attached UI.
+
+======================================================================
+23. IMPLEMENTATION WORKFLOW
+======================================================================
+
+Follow this exact workflow:
+
+STEP 1
+Read the entire attached UI file.
+
+STEP 2
+Inspect the repository.
+
+STEP 3
+Determine what the file represents:
+page / component / section / layout.
+
+STEP 4
+Determine the route.
+
+If route is unknown:
+ASK ME.
+
+STEP 5
+Inspect existing reusable components.
+
+STEP 6
+Inspect required APIs/data.
+
+STEP 7
+Identify dependencies.
+
+STEP 8
+Implement the UI.
+
+STEP 9
+Integrate the existing data/API.
+
+STEP 10
+Implement loading/error/empty states where applicable.
+
+STEP 11
+Test desktop.
+
+STEP 12
+Test mobile.
+
+STEP 13
+Check accessibility.
+
+STEP 14
+Run TypeScript/build/tests.
+
+STEP 15
+Fix errors.
+
+STEP 16
+Verify the rendered result.
+
+======================================================================
+24. ASK ME WHEN NECESSARY
+======================================================================
+
+Ask me instead of guessing when:
+
+- route is unknown
+- destination page is unknown
+- important visual behavior is missing
+- API endpoint is missing
+- backend data is unavailable
+- business behavior is ambiguous
+- the attached file conflicts with the existing project
+- a major architecture change is required
+
+Ask the smallest question necessary to continue.
+
+Examples:
+
+"Which route should this UI use?"
+
+"The attached component requires product data, but the current API doesn't expose it. Should I add an endpoint or use demo data?"
+
+"The design contains a logo, but the project's final branding has not been defined. What should I use?"
+
+======================================================================
+25. DO NOT PREDICT THE NEXT TASK
+======================================================================
+
+Implement ONLY the UI represented by the attached file.
+
+Do not automatically implement another page afterward.
+
+Do not automatically create additional sections.
+
+Do not predict what I want next.
+
+Wait for my next instruction.
+
+======================================================================
+26. FINAL CHECK
+======================================================================
+
+Before declaring the task complete:
+
+[ ] Attached UI fully understood
+[ ] Correct page/component identified
+[ ] Correct route confirmed
+[ ] Existing components reused
+[ ] Design faithfully implemented
+[ ] No unrelated branding
+[ ] No competitor assets
+[ ] No invented business data
+[ ] Existing API used correctly
+[ ] No invented API endpoint
+[ ] 3–4 image support where applicable
+[ ] Image alt text
+[ ] Loading state
+[ ] Error state
+[ ] Empty state
+[ ] Responsive
+[ ] Accessible
+[ ] TypeScript passes
+[ ] Build passes
+[ ] No obvious runtime errors
+[ ] No obvious console errors
+
+======================================================================
+27. FINAL RESPONSE
+======================================================================
+
+After completing the implementation, report:
+
+1. What was implemented
+2. Files modified
+3. Components reused
+4. Dependencies added, if any
+5. API/data sources used
+6. Any assumptions
+7. Any unresolved questions
+8. Tests/checks performed
+
+Do not claim completion unless you actually verified the implementation.
+
+======================================================================
+START
+======================================================================
+
+Read the attached UI/design file completely.
+
+Then inspect the existing repository.
+
+Then integrate that UI into the existing gemstone application.
+
+Do not guess.
+
+Ask when necessary.
+
+Preserve the provided design.
+
+
+
+
+
+
+
+
+
+
+
+

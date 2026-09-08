@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+frontend/dist/
+backend/dist/
+
+# Environment files (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# Local real inventory imports
+backend/src/seeds/inventory/inventory.local.js
+backend/src/seeds/inventory/*.local.js
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Testing / coverage
+coverage/

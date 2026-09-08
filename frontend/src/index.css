@@ -1,0 +1,142 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.625rem;
+  --background: #ffffff;
+  --foreground: #050040;
+  --card: #ffffff;
+  --card-foreground: #050040;
+  --popover: #ffffff;
+  --popover-foreground: #050040;
+  --primary: #050040;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f6;
+  --secondary-foreground: #1a1a2e;
+  --muted: #f4f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #f4f4f6;
+  --accent-foreground: #1a1a2e;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #c9a24b;
+  --surface: #ffffff;
+  --surface-soft: #faf8f2;
+  --surface-muted: #f8fafc;
+  --shadow-soft: 0 18px 50px rgba(5, 0, 64, 0.08);
+  --shadow-card: 0 14px 30px rgba(5, 0, 64, 0.07);
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@theme inline {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-gold: #c9a24b;
+  --color-surface: var(--surface);
+  --color-surface-soft: var(--surface-soft);
+  --color-surface-muted: var(--surface-muted);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+  :focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--ring) 70%, transparent);
+    outline-offset: 3px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--ring) 26%, transparent);
+    color: var(--foreground);
+  }
+}
+
+@layer utilities {
+  .page-shell {
+    @apply mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8;
+  }
+  .section-stack {
+    @apply space-y-14 md:space-y-16;
+  }
+  .premium-card {
+    border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+  .premium-panel {
+    border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(250, 248, 242, 0.88)),
+      var(--surface);
+    box-shadow: var(--shadow-soft);
+  }
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .skeleton {
+    @apply animate-pulse rounded-md bg-slate-200;
+  }
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(5, 0, 64, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(5, 0, 64, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+
+@keyframes showcase-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
