@@ -27,12 +27,21 @@ export async function listReviews(req, res) {
 }
 
 export async function createReview(req, res) {
-  const { product, name, rating, title, comment } = res.locals.review
+  const { product, rating, title, comment } = res.locals.review
 
   const prod = await Product.findOne({ _id: product, status: 'ACTIVE' }).select('_id').lean()
   if (!prod) return res.status(404).json({ error: 'Product not found' })
 
-  const review = await Review.create({ product, name, rating, title, comment })
+  // The reviewer is the authenticated session user; the name is snapshotted so
+  // existing reviews keep the name they were written under.
+  const review = await Review.create({
+    product,
+    user: req.user._id,
+    name: req.user.name,
+    rating,
+    title,
+    comment,
+  })
 
   const aggregate = await Review.aggregate([
     { $match: { product: new Types.ObjectId(product), status: 'APPROVED' } },

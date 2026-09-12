@@ -1,12 +1,3 @@
-export interface Certificate {
-  labName?: string
-  reportNumber?: string
-  issueDate?: string
-  verificationUrl?: string
-  verificationStatus?: string
-  documentRef?: string
-}
-
 export interface ProductImage {
   url: string
   altText: string
@@ -40,7 +31,6 @@ export interface Product {
   inventory: number
   isUnique: boolean
   images: ProductImage[]
-  certificates: Certificate[]
   description?: string
   createdAt?: string
 }
@@ -113,4 +103,129 @@ export interface CategorySuggestion {
 export interface SuggestResult {
   products: SuggestionProduct[]
   categories: CategorySuggestion[]
+}
+
+export interface User {
+  id: string
+  name: string
+  email: string
+  role: 'customer' | 'admin'
+}
+
+export interface CartItem {
+  productId: string
+  sku: string
+  name: string
+  qty: number
+  unitPrice: number
+  lineTotal: number
+  currency: string
+  inventory: number
+  isUnique: boolean
+  image: ProductImage | null
+}
+
+export interface Cart {
+  items: CartItem[]
+  count: number
+  subtotal: number
+  shippingAmount: number
+  total: number
+  currency: string
+}
+
+export interface OrderItem {
+  product: string
+  sku: string
+  name: string
+  priceType: 'FIXED' | 'PER_CARAT'
+  purchasedPrice: number
+  currency: string
+  qty: number
+  itemTotal: number
+}
+
+export type OrderStatus =
+  | 'PENDING_PAYMENT'
+  | 'PAID'
+  | 'PROCESSING'
+  | 'SHIPPED'
+  | 'DELIVERED'
+  | 'CANCELLED'
+  | 'REFUNDED'
+
+export interface ShippingAddress {
+  name: string
+  email: string
+  phone: string
+  address: string
+  city: string
+  state: string
+  postalCode: string
+  country: string
+}
+
+export interface Order {
+  reference: string
+  status: OrderStatus
+  timeline: { status: OrderStatus; at: string }[]
+  items: OrderItem[]
+  subtotal: number
+  shippingAmount: number
+  total: number
+  currency: string
+  shippingAddress: ShippingAddress
+  payment: { provider: string; razorpayOrderId: string; method: string }
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CheckoutPayment {
+  key: string
+  orderId: string
+  amount: number
+  currency: string
+}
+
+export interface CheckoutResult {
+  order: Order
+  payment: CheckoutPayment
+}
+
+export interface AdminCategory {
+  _id: string
+  id?: string
+  name: string
+  slug: string
+  parent?: string | null
+  description?: string
+  active?: boolean
+  order?: number
+}
+
+export interface AdminProduct {
+  _id: string
+  sku: string
+  name: string
+  slug: string
+  category: CategoryRef | string
+  description?: string
+  gemstoneType?: string
+  origin?: string
+  treatment?: string
+  weightCarat?: number | null
+  weightRatti?: number | null
+  color?: string
+  shape?: string
+  clarity?: string
+  cut?: string
+  dimensions?: string
+  pricing: { type: 'FIXED' | 'PER_CARAT'; amount: number; currency: string }
+  priceState: 'PUBLIC_PRICE' | 'CONTACT_FOR_PRICE'
+  inventory: number
+  isUnique: boolean
+  status: 'DRAFT' | 'ACTIVE' | 'ON_HOLD' | 'SOLD' | 'ARCHIVED'
+  images: ProductImage[]
+  seoTitle?: string
+  seoDescription?: string
 }

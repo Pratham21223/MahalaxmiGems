@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { BadgeCheck, MessageCircle, PackageCheck } from 'lucide-react'
+import { MessageCircle, PackageCheck, RotateCcw, ShieldCheck } from 'lucide-react'
 import { useFetch } from '@/hooks/useFetch'
 import { getProduct, getProducts } from '@/lib/api'
 import type { Product } from '@/lib/types'
@@ -8,7 +8,9 @@ import { PriceDisplay } from '@/components/PriceDisplay'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { ProductGrid } from '@/components/ProductGrid'
 import { ReviewSection } from '@/components/ReviewSection'
+import { WishlistButton } from '@/components/WishlistButton'
 import { Loading, ErrorState } from '@/components/Status'
+import { AddToCartButton, BuyNowButton } from '@/components/PurchaseActions'
 
 function SpecRow({ label, value }: { label: string; value?: string | number | null }) {
   if (value === undefined || value === null || value === '') return null
@@ -42,6 +44,8 @@ export function ProductPage() {
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
   const inStock = product.inventory > 0
   const relatedItems = (related.data?.items || []).filter((p) => p.id !== product.id)
+  const description = (product.description || '').trim()
+  const visibleDescription = /^DEMO DATA/i.test(description) ? '' : description
 
   return (
     <div className="page-shell section-stack py-6">
@@ -51,12 +55,15 @@ export function ProductPage() {
         <ProductGallery product={product} />
 
         <div className="space-y-6">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">
-              {product.gemstoneType || 'Product detail'}
-            </p>
-            <h1 className="text-balance mt-2 text-3xl font-semibold text-primary md:text-4xl">{product.name}</h1>
-            <p className="mt-2 text-sm text-muted-foreground">SKU: {product.sku}</p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">
+                {product.gemstoneType || 'Product detail'}
+              </p>
+              <h1 className="text-balance mt-2 text-3xl font-semibold text-primary md:text-4xl">{product.name}</h1>
+              <p className="mt-2 text-sm text-muted-foreground">SKU: {product.sku}</p>
+            </div>
+            <WishlistButton productId={product.id} className="shrink-0" />
           </div>
 
           <div className="rounded-2xl border border-slate-100 bg-white p-5 text-2xl shadow-sm">
@@ -66,12 +73,25 @@ export function ProductPage() {
                 <PackageCheck className="size-3.5" />
                 {inStock ? 'Available inventory' : 'Currently unavailable'}
               </span>
-              {product.certificates?.length ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-gold/10 px-3 py-1 text-primary">
-                  <BadgeCheck className="size-3.5 text-gold" />
-                  Certificate available
-                </span>
-              ) : null}
+            </div>
+
+            {product.priceState === 'PUBLIC_PRICE' && inStock && (
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <AddToCartButton product={product} />
+                <BuyNowButton product={product} />
+              </div>
+            )}
+
+            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 border-t border-slate-100 pt-4 text-xs font-medium text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <RotateCcw className="size-3.5 text-gold" /> Easy returns
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <ShieldCheck className="size-3.5 text-gold" /> Secure payments
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <MessageCircle className="size-3.5 text-gold" /> WhatsApp support
+              </span>
             </div>
           </div>
 
@@ -79,13 +99,13 @@ export function ProductPage() {
             href={whatsappUrl}
             target="_blank"
             rel="noreferrer"
-            className="focus-ring inline-flex items-center gap-2 rounded-full bg-[#25D366] px-6 py-3 font-medium text-white transition hover:-translate-y-0.5 hover:brightness-105"
+            className={`focus-ring inline-flex items-center gap-2 rounded-full bg-[#25D366] px-6 py-3 font-medium text-white transition hover:-translate-y-0.5 hover:brightness-105 ${product.priceState === 'PUBLIC_PRICE' ? 'bg-[#25D366]/90' : ''}`}
           >
             <MessageCircle className="size-5" /> Ask on WhatsApp
           </a>
 
-          {product.description && (
-            <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{product.description}</p>
+          {visibleDescription && (
+            <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{visibleDescription}</p>
           )}
         </div>
       </div>
@@ -107,32 +127,6 @@ export function ProductPage() {
         </div>
       </section>
 
-      {product.certificates && product.certificates.length > 0 && (
-        <section>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">Documents</p>
-          <h2 className="mt-1 text-2xl font-semibold text-primary">Certificate</h2>
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {product.certificates.map((c, i) => (
-              <div key={i} className="premium-card px-5 py-4 text-sm">
-                <p className="font-medium text-foreground">
-                  {c.labName} - Report #{c.reportNumber}
-                </p>
-                {c.issueDate && (
-                  <p className="text-muted-foreground">Issued: {new Date(c.issueDate).toLocaleDateString()}</p>
-                )}
-                {c.verificationUrl && (
-                  <a href={c.verificationUrl} target="_blank" rel="noreferrer" className="focus-ring mt-2 inline-flex rounded-md text-gold underline">
-                    Verify
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      <ReviewSection productId={product.id} />
-
       {relatedItems.length > 0 && (
         <section>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">More to view</p>
@@ -140,6 +134,8 @@ export function ProductPage() {
           <ProductGrid products={relatedItems} />
         </section>
       )}
+
+      <ReviewSection productId={product.id} />
     </div>
   )
 }

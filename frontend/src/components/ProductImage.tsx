@@ -1,7 +1,7 @@
 import type { Product } from '@/lib/types'
 
 // Distinct navy/gold gradient variants so placeholder "views" visibly change
-// when sliding (front / side / close-up / certificate). Replaced by real photos.
+// when sliding (front / side / close-up). Replaced by real photos.
 const GRADIENTS = [
   'from-[#0b0342] to-[#1a1150]',
   'from-[#181052] to-[#2a1a66]',

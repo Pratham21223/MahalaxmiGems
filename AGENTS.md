@@ -3,84 +3,160 @@
 ## Overview
 
 Gemstone e-commerce platform (MERN) for a family gemstone business. Monorepo via
-npm workspaces: `frontend` (React + Vite + TypeScript + shadcn/ui) and `backend`
-(Express + Mongoose, plain JavaScript).
+npm workspaces: `frontend` (React 19 + Vite + TypeScript + shadcn/ui) and
+`backend` (Express 4 + Mongoose 9, plain JS, ESM).
 
-`plan.txt` is the source of truth — read it before any feature work. It defines
-the Phase 1 scope, the mandated stack, and hard behavioral rules. It wins over
-this file on any conflict.
+`docs/plan.txt` is the source of truth — read it before any feature work. It
+defines scope, the mandated stack, and hard behavioral rules, and wins over this
+file on any conflict. Phase/design context: `docs/implementation-phases.md`,
+`real-inventory-seeding.md`, `ui-registry.md`, `backend-principles.md`,
+`docs/specs/`.
 
-## Status — Phase 1 (catalog) complete
+**Git reality check:** `main` has a single initial-catalog commit; most Phase 2–4
+code and doc edits are uncommitted or untracked (`git status` has ~60 entries).
+Confirm against the working tree, not HEAD, and never `git clean`/`git checkout .`
+blindly.
 
-Customer-facing catalog is built and verified:
-- Public pages: Home, Category `/categories/:slug`, Product `/products/:id`,
-  Search `/search`, plus placeholder `/contact` and `/gem-suggestions`, and 404.
-- Two-tier navbar: top bar (logo · search · account/wishlist/cart icons ·
-  "Contact Us") + bottom discovery nav (Home · Gemstones▾ · Jewellery▾ ·
-  Gem Suggestions). Mobile uses a single row + drawer (`Sheet`).
-- Search has a 20/80 "All ▾" category dropdown and filters via `?category=`.
+## Status
 
-Still DEFERRED (not built): admin, auth, cart, wishlist, checkout, payments,
-orders. Account/Wishlist/Cart icons are inert placeholders (no counts). Products
-load via a clearly-marked demo seed — never hardcode the catalog into React.
+Phases 0–4 are code-complete (catalog, auth, cart/wishlist, checkout + Razorpay,
+orders, admin, tests). The live end-to-end §54 gate is untested until real
+Razorpay test-mode keys + `ADMIN_EMAIL`/`ADMIN_PASSWORD` are set in
+`backend/.env`.
 
-## Commands (run from repo root)
+Routes live in `frontend/src/App.tsx` (pages lazy-loaded). Customer: `/`,
+`/categories/:slug`, `/products/:id`, `/search`, `/gemstones`, `/rudraksha`,
+`/about`, `/contact`, `/gem-suggestions`, `/login`, `/register`, `/account`,
+`/cart`, `/checkout`, `/order/:reference`, 404. Admin is one tabbed `/admin`
+page — there are no `/admin/*` subroutes.
 
-- `npm run dev` — frontend (Vite :5173) + backend (node --watch :4000)
-- `npm run dev:client` / `npm run dev:server` — one side only
-- `npm run seed` — (backend) wipe + re-seed 21 demo categories / 60 demo products
-- `npm run typecheck` — (frontend) `tsc --noEmit`
-- `npm run lint` — frontend `eslint .` + backend `node --check src/server.js`
-- `npm run build` — frontend `vite build`; backend has no `build` script, so the
-  root build currently fails at the backend step
+## Commands (from repo root)
 
-No test framework configured. No git repo initialized.
+- `npm run dev` — Vite :5173 + backend `node --watch` :4000 (`dev:client` /
+  `dev:server` for one side)
+- `npm run lint` — frontend `eslint .` + backend `node --check src/server.js`;
+  the backend has no ESLint or typecheck
+- `npm run typecheck --workspace frontend` — root has no `typecheck` script
+  (`tsc --noEmit`)
+- `npm run test --workspace backend` — node:test + supertest. One file:
+  `npm run test --workspace backend -- test/auth.test.js`. Needs a local MongoDB;
+  each test file drops `gemstone_store_test` and tests run sequentially
+  (`--test-concurrency=1`).
+- `npm run build` — frontend `vite build`, then fails at backend `build`, which
+  does not exist (expected)
+- No root `test` or `seed` scripts — go through `--workspace backend`.
 
-## Stack
+## Seeding — two very different paths
 
-- Frontend: React 19, Vite, **TypeScript**, Tailwind v4 via `@tailwindcss/vite`
-  (no `tailwind.config.js`; styles via `@import "tailwindcss"` in `src/index.css`),
-  **shadcn/ui** (`components.json`, `@/` path alias, `src/components/ui/*`). ESLint
-  uses `typescript-eslint` (eslint 10). shadcn components import the consolidated
-  `radix-ui` package and `lucide-react`.
-- Backend: Express 4, **Mongoose** 9, `dotenv` + `pino`. Plain JS (`*.js`,
-  `"type": "module"`). Layered structure under `src/`: entry `src/server.js`;
-  `config/` (env, logger, db), `controllers/`, `middlewares/`, `models/`,
-  `routes/` (categories, products, search, reviews), `seeds/` (demo seed),
-  `utils/` (serializers, helpers). "Lint" is `node --check` only (just the entry
-  file) — no ESLint on the backend.
+- **Demo reseed (DESTRUCTIVE, dev only):** `npm run seed --workspace backend`
+  deletes ALL categories/products/reviews and recreates development data
+  (descriptions marked "DEMO DATA"; Rudraksha SKUs `DEMO-RUD-*`). Never run once
+  real inventory is loaded.
+- **Catalog import (SAFE/ADDITIVE):** `npm run seed:catalog` runs
+  `backend/src/seeds/seedInventory.js`. Its default source is
+  `backend/src/seeds/inventory/catalog/index.js`; that directory is empty in the
+  current tree, so without catalog files the command dies with
+  `ERR_MODULE_NOT_FOUND` — pass `--file <path>` or add the catalog files. The
+  importer never deletes; matches categories by `slug` and products by
+  `sku|slug`; refuses to modify `DEMO-*` SKUs; creates products as `DRAFT`
+  (publicly invisible) until set `ACTIVE`. `--dry-run` previews,
+  `--update-existing` overwrites catalog fields. Full workflow:
+  `docs/real-inventory-seeding.md`.
+- Pass importer flags after `--` (`npm run seed:catalog -- --dry-run`). Without
+  the `--`, npm swallows the flag and the importer runs in write mode against the
+  default source.
+
+## Stack / layout
+
+- Frontend: Tailwind v4 via `@tailwindcss/vite` (no `tailwind.config.js`;
+  `@import "tailwindcss"` in `src/index.css`), shadcn/ui (`components.json`, `@/`
+  alias to `src/`, consolidated `radix-ui` package), `tw-animate-css`.
+  `vite.config.js` (not `.ts`) proxies `/api` and `/health` to :4000, so dev is
+  same-origin; `src/lib/api.ts` axios uses `baseURL: '/api'` + `withCredentials`.
+  Auth/cart contexts in `src/context/`.
+- Backend: `src/app.js` is the `createApp()` factory (tests import it after
+  connecting); `src/server.js` is the entry (connect + `ensureAdmin` + listen).
+  `models/` (Category, Product, Review, User, Cart, Order), `routes/` (categories,
+  products, search, reviews, auth, cart, wishlist, orders, admin), `services/`
+  (razorpay, bootstrapAdmin), `seeds/` (demo `index.js`, `seedInventory.js`),
+  `utils/` (cart, inventory, pricing, serialize, categoryDescendants), Zod
+  schemas in `src/schemas.js` (not `utils/`). Tests in `backend/test/` (not under
+  `src/`). Plain JS, ESM, `.js` import extensions.
+
+## Security posture (from `docs/backend-principles.md`)
+
+- Zod allow-list validation on every write; server-side sessions in HttpOnly
+  `SameSite=Lax` cookies (no JWT/localStorage); bcrypt cost 12; `requireAdmin`
+  deny-by-default.
+- BOLA: order lookups are owner/guest-scoped and return 404; customer order URLs
+  use UUID references.
+- Razorpay: backend creates the order; the webhook is authoritative
+  (HMAC-verified, idempotent, mounted with `express.raw` before `express.json` in
+  `app.js`), and `/confirm` re-verifies server-side. Never trust a frontend
+  payment callback alone.
+- Overselling is prevented by an atomic conditional decrement (`findOneAndUpdate`
+  on `ACTIVE` + `inventory:{$gte:qty}` in `utils/inventory.js`), released on
+  cancel/failure. The two-buyers-one-unique-stone test is
+  `backend/test/concurrency.test.js`.
+- Known deviation: `mongoose.set('sanitizeFilter', true)` is deliberately NOT
+  used — it breaks casting of operator range queries on embedded numeric paths
+  (price/carat filters).
+- `backend/.env.example` currently ships working Razorpay **test-mode**
+  credentials (including the webhook secret). Dev-only; rotate/replace before
+  production and never commit real secrets.
 
 ## Design system (frontend)
 
-- Tokens in `src/index.css`: `--primary` navy `#050040`, `--color-gold` `#C9A24B`,
-  Poppins font (Google Fonts link in `index.html`). `@theme inline` maps shadcn vars.
-- Custom utility `.bg-grid` (hero grid background).
+- Tokens in `src/index.css`: navy `--primary` `#050040`, gold `#C9A24B`, Poppins;
+  `@theme inline` maps shadcn vars; `.bg-grid` utility.
+- `docs/ui-registry.md` holds verified patterns (page-shell/section-stack,
+  premium-card/panel, `focus-ring`, status chips,
+  `₹{n.toLocaleString('en-IN')}` money). `frontend/design.md` is the extracted
+  design mandate. Check both before building new UI.
+- Nav mega-menus are curated in `frontend/src/lib/nav.ts` and keyed to seeded
+  category slugs — don't add slugs the seed doesn't create.
 
-## API (public, backend authoritative)
+## API (backend is authoritative)
 
 - `GET /api/categories` (tree) · `GET /api/categories/:slug`
-- `GET /api/products` — filters `origin/color/shape/treatment/cut/gemstoneType`,
-  `minPrice/maxPrice`, `minCarat/maxCarat`, `category`; sort
-  `default|price_asc|price_desc|newest`; `page`/`limit`. ACTIVE only;
-  `CONTACT_FOR_PRICE` products omit price.
-- `GET /api/products/:id`
-- `GET /api/search?q=&category=` — `category` slug resolves descendants; Hindi
-  aliases: pukhraj/panna/manik/neelam/gomed/lehsunia.
+- `GET /api/products` — filters `category`, `notCategory`,
+  `origin/color/shape/treatment/cut/gemstoneType`, `min/maxPrice`,
+  `min/maxCarat`; sort `default|price_asc|price_desc|newest`; `page`/`limit`.
+  ACTIVE only; `CONTACT_FOR_PRICE` products omit price · `GET /api/products/:id`
+- `GET /api/search?q=&category=` (descendants + Hindi aliases) ·
+  `GET /api/search/suggest?q=&limit=` · `GET /api/reviews` ·
+  `POST /api/reviews` (auth; name comes from the session user)
+- `POST /api/auth/register|login|logout` · `GET /api/auth/me`
+- `GET/POST /api/cart` · `PATCH|DELETE /api/cart/:productId` (guest + logged-in;
+  server-computed totals)
+- `GET/POST /api/wishlist` · `DELETE /api/wishlist/:productId` (auth)
+- `POST /api/orders` (guest or auth; `items` optional = Buy Now) ·
+  `GET /api/orders` (auth) · `GET /api/orders/:reference` (owner/guest) ·
+  `POST /api/orders/:reference/confirm|cancel` · `POST /api/orders/webhook`
+  (raw body)
+- `/api/admin/*` (admin): categories/products CRUD · `GET /admin/orders` ·
+  `GET /admin/orders/:reference` · `PATCH /admin/orders/:reference/status`
 
 ## Config / env
 
-- Backend `.env` (copy `backend/.env.example`): `PORT=4000`,
-  `CORS_ORIGIN=http://localhost:5173`,
-  `MONGODB_URI=mongodb://127.0.0.1:27017/gemstone_store`. `.env` is gitignored —
-  never commit secrets. MongoDB must be running locally.
+- `backend/src/config/index.js` has safe local defaults, so no `.env` is needed
+  for catalog dev. `MONGODB_URI` defaults to
+  `mongodb://127.0.0.1:27017/gemstone_store` — MongoDB must be running locally;
+  tests always target `gemstone_store_test`.
+- For payments/admin, copy `backend/.env.example` → `backend/.env` (gitignored)
+  and set `SESSION_SECRET`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`,
+  `RAZORPAY_WEBHOOK_SECRET`, optionally `ADMIN_EMAIL`/`ADMIN_PASSWORD` (creates
+  the first admin at startup). Without Razorpay keys checkout returns 503 and
+  reserved inventory is released.
 
 ## Working conventions (from plan.txt)
 
-- Never invent routes, UI layout, business rules, or business data. Ask before
-  adding a route/page without an approved design prompt.
-- Catalog is database-driven; never hardcode categories/products into React.
-  The nav mega-menu uses a curated static config in `src/lib/nav.ts` keyed to
-  seeded slugs — don't add slugs that aren't in the seed.
+- Never invent routes, UI, business rules, or real business data — ask when a
+  product decision is unknown or no design prompt exists. plan.txt §3 lists
+  features that must not be built (astrology/AI/referrals/marketplace/etc.).
 - Backend is authoritative for price/inventory/totals/status; never trust
-  frontend-submitted values for business-critical data.
-- Demo/test data must be clearly marked (`DEMO-*` SKUs). Small logical `feat:` commits.
+  frontend-submitted business values. Catalog is database-driven — never hardcode
+  products/categories into React.
+- Demo/test data must stay clearly marked (`DEMO-*` where possible / "DEMO DATA"
+  descriptions); never reuse a `DEMO-*` SKU for real stock.
+- Small logical `feat:` commits. Don't commit unless explicitly asked.

@@ -9,9 +9,16 @@ into React.
 
 ## Status
 
-- ✅ Phase 0 — done (TS + shadcn, Mongoose models, seed: 21 categories / 60 products)
+- ✅ Phase 0 — done (TS + shadcn, Mongoose models, demo seed)
 - ✅ Phase 1 — done (public catalog: home/category/product/search pages, two-tier navbar, search with category dropdown)
-- ⏭️ Next: Phase 2 (customer auth + cart)
+- ✅ Phase 2 — done (customer auth, guest + logged-in cart, wishlist, WhatsApp enquiry)
+- ✅ Phase 3 — done (checkout, Razorpay test mode + verified webhook, order snapshots + state machine, atomic inventory reservation)
+- ✅ Phase 4 — done (admin login + `/admin/*` categories/products/orders, security hardening, backend test suite incl. the unique-stone concurrency test)
+
+**The §54 Phase 1 success gate is now code-complete.** The remaining live
+dependency is real Razorpay test-mode keys + `ADMIN_EMAIL`/`ADMIN_PASSWORD` in
+`backend/.env` (see `backend/.env.example`), after which the end-to-end flow can
+be exercised against the running app.
 
 ## Phase 0 — Foundation, data layer & seed data
 Sources: plan.txt §7, §11, §12, §13, §14, §15, §16

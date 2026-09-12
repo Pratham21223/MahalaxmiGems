@@ -13,6 +13,13 @@ const AboutPage = lazy(() => import('@/pages/AboutPage').then((m) => ({ default:
 const GemstonesPage = lazy(() => import('@/pages/GemstonesPage').then((m) => ({ default: m.GemstonesPage })))
 const RudrakshaPage = lazy(() => import('@/pages/RudrakshaPage').then((m) => ({ default: m.RudrakshaPage })))
 const NotFound = lazy(() => import('@/pages/NotFound').then((m) => ({ default: m.NotFound })))
+const LoginPage = lazy(() => import('@/pages/LoginPage').then((m) => ({ default: m.LoginPage })))
+const RegisterPage = lazy(() => import('@/pages/RegisterPage').then((m) => ({ default: m.RegisterPage })))
+const AccountPage = lazy(() => import('@/pages/AccountPage').then((m) => ({ default: m.AccountPage })))
+const CartPage = lazy(() => import('@/pages/CartPage').then((m) => ({ default: m.CartPage })))
+const CheckoutPage = lazy(() => import('@/pages/CheckoutPage').then((m) => ({ default: m.CheckoutPage })))
+const OrderConfirmationPage = lazy(() => import('@/pages/OrderConfirmationPage').then((m) => ({ default: m.OrderConfirmationPage })))
+const AdminPage = lazy(() => import('@/pages/AdminPage').then((m) => ({ default: m.AdminPage })))
 
 function CategoryRoute() {
   const { slug } = useParams()
@@ -45,6 +52,13 @@ export default function App() {
           <Route path="/gemstones" element={<GemstonesPage />} />
           <Route path="/rudraksha" element={<RudrakshaPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/order/:reference" element={<OrderConfirmationPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

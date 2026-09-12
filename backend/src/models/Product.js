@@ -1,17 +1,5 @@
 import mongoose from 'mongoose'
 
-const certificateSchema = new mongoose.Schema(
-  {
-    labName: { type: String, default: '' },
-    reportNumber: { type: String, default: '' },
-    issueDate: { type: Date },
-    verificationUrl: { type: String, default: '' },
-    verificationStatus: { type: String, default: '' },
-    documentRef: { type: String, default: '' },
-  },
-  { _id: false },
-)
-
 const imageSchema = new mongoose.Schema(
   {
     // `url` is optional until real product photos are added; empty means the
@@ -58,7 +46,6 @@ const productSchema = new mongoose.Schema(
       default: 'DRAFT',
     },
     images: { type: [imageSchema], default: [] },
-    certificates: { type: [certificateSchema], default: [] },
     seoTitle: { type: String, default: '' },
     seoDescription: { type: String, default: '' },
   },

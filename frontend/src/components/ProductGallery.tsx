@@ -23,7 +23,7 @@ export function ProductGallery({ product }: { product: Product }) {
 
   return (
     <div>
-      <div className="relative">
+      <div className="group relative">
         {current.url ? (
           <img
             src={current.url}
@@ -43,7 +43,7 @@ export function ProductGallery({ product }: { product: Product }) {
               type="button"
               onClick={prev}
               aria-label="Previous image"
-              className="focus-ring absolute left-3 top-1/2 -translate-y-1/2 rounded-full border border-slate-200 bg-white/90 p-2 text-primary shadow hover:bg-white"
+              className="focus-ring absolute left-3 top-1/2 -translate-y-1/2 rounded-full border border-slate-200 bg-white/90 p-2 text-primary opacity-0 shadow transition hover:bg-white focus-visible:opacity-100 group-hover:opacity-100"
             >
               <ChevronLeft className="size-5" />
             </button>
@@ -51,7 +51,7 @@ export function ProductGallery({ product }: { product: Product }) {
               type="button"
               onClick={next}
               aria-label="Next image"
-              className="focus-ring absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-slate-200 bg-white/90 p-2 text-primary shadow hover:bg-white"
+              className="focus-ring absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-slate-200 bg-white/90 p-2 text-primary opacity-0 shadow transition hover:bg-white focus-visible:opacity-100 group-hover:opacity-100"
             >
               <ChevronRight className="size-5" />
             </button>

@@ -1,20 +1,32 @@
+import { Link } from 'react-router-dom'
 import { User, Heart, ShoppingBag } from 'lucide-react'
+import { useAuth } from '@/context/AuthContext'
+import { useCart } from '@/context/CartContext'
 
-// Account / Wishlist / Cart are not implemented yet — rendered as inert
-// placeholders (no counts, no fake behavior) until those features exist.
+const btn = 'focus-ring relative inline-flex items-center rounded-full p-2.5 text-slate-700 transition hover:bg-slate-100 hover:text-primary'
+
 export function NavIcons() {
-  const btn = 'focus-ring rounded-full p-2.5 text-slate-700 transition hover:bg-slate-100 hover:text-primary'
+  const { user } = useAuth()
+  const { count } = useCart()
+
+  const accountTo = user ? '/account' : '/login'
+
   return (
     <div className="flex items-center gap-0.5">
-      <button type="button" aria-label="Account" aria-disabled="true" title="Account coming later" className={btn}>
+      <Link to={accountTo} aria-label={user ? 'Account' : 'Sign in'} className={btn}>
         <User className="size-5" />
-      </button>
-      <button type="button" aria-label="Wishlist" aria-disabled="true" title="Wishlist coming later" className={btn}>
+      </Link>
+      <Link to={user ? '/account?tab=wishlist' : '/login'} aria-label="Wishlist" className={btn}>
         <Heart className="size-5" />
-      </button>
-      <button type="button" aria-label="Cart" aria-disabled="true" title="Cart coming later" className={btn}>
+      </Link>
+      <Link to="/cart" aria-label={`Cart, ${count} items`} className={btn}>
         <ShoppingBag className="size-5" />
-      </button>
+        {count > 0 && (
+          <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-white">
+            {count > 99 ? '99+' : count}
+          </span>
+        )}
+      </Link>
     </div>
   )
 }

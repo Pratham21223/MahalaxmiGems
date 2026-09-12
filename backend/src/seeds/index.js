@@ -50,9 +50,8 @@ const categories = [
 
 // Per-category demo product generation spec. `sapphire` (the parent) has no products.
 const CATALOG = [
-  { category: 'blue-sapphire', gemstoneType: 'Blue Sapphire', origins: ['Ceylon', 'Kashmir', 'Thailand', 'Madagascar'], colors: ['Royal Blue', 'Cornflower Blue'], basePrice: 45000, count: 5 },
+  { category: 'blue-sapphire', gemstoneType: 'Blue Sapphire', origins: ['Ceylon', 'Kashmir', 'Thailand', 'Madagascar'], colors: ['Royal Blue', 'Cornflower Blue'], basePrice: 45000, count: 33 },
   { category: 'yellow-sapphire', gemstoneType: 'Yellow Sapphire', origins: ['Ceylon', 'Thailand'], colors: ['Golden Yellow', 'Lemon Yellow'], basePrice: 32000, count: 3 },
-  { category: 'pink-sapphire', gemstoneType: 'Pink Sapphire', origins: ['Madagascar', 'Ceylon'], colors: ['Pink', 'Hot Pink'], basePrice: 28000, count: 3 },
   { category: 'ruby', gemstoneType: 'Ruby', origins: ['Burma', 'Mozambique', 'Thailand', 'Tanzania'], colors: ['Pigeon Blood', 'Vivid Red'], basePrice: 98000, count: 5 },
   { category: 'emerald', gemstoneType: 'Emerald', origins: ['Colombia', 'Zambia', 'Panjshir', 'Ethiopia'], colors: ['Vivid Green', 'Green'], basePrice: 56000, count: 5 },
   { category: 'diamond', gemstoneType: 'Diamond', origins: ['Africa', 'India'], colors: ['White', 'Colorless'], basePrice: 120000, count: 3 },
@@ -82,7 +81,7 @@ function buildGemstoneProducts() {
   for (const c of CATALOG) {
     for (let i = 0; i < c.count; i++) {
       n++
-      const weight = +(1 + ((i * 0.75) % 9)).toFixed(2)
+      const weight = +(1 + ((i * 0.25) % 29)).toFixed(2)
       const origin = c.origins[i % c.origins.length]
       const color = c.colors[i % c.colors.length]
       const shape = SHAPES[i % SHAPES.length]
@@ -96,13 +95,12 @@ function buildGemstoneProducts() {
         `${c.gemstoneType} front view`,
         `${c.gemstoneType} side view`,
         `${c.gemstoneType} close-up`,
-        `${c.gemstoneType} certificate`,
       ].map((altText, i) => ({ url: '', altText, order: i }))
 
       list.push({
-        sku: `DEMO-${code}-${String(n).padStart(3, '0')}`,
+        sku: `${code}-${String(n).padStart(3, '0')}`,
         name: `${c.gemstoneType} ${weight.toFixed(2)} Carat`,
-        slug: `demo-${c.category}-${n}`,
+        slug: `${c.category}-${n}`,
         category: c.category,
         gemstoneType: c.gemstoneType,
         origin,
@@ -119,7 +117,6 @@ function buildGemstoneProducts() {
         inventory: isUnique ? 1 : 2 + (i % 3),
         isUnique,
         description: 'DEMO DATA — development placeholder. Replace with real inventory.',
-        certificates: [{ labName: 'DEMO Lab', reportNumber: `DEMO-${String(n).padStart(4, '0')}` }],
         images,
       })
     }
@@ -136,7 +133,7 @@ function buildRudrakshaProducts() {
       const size = +(0.9 + mukhi * 0.04 + i * 0.12).toFixed(2)
       const priceState = i % 2 === 0 ? 'PUBLIC_PRICE' : 'CONTACT_FOR_PRICE'
       const amount = Math.round((600 + mukhi * 350 + i * 150) / 100) * 100
-      const images = ['front view', 'side view', 'close-up', 'certificate'].map((v, idx) => ({
+      const images = ['front view', 'side view', 'close-up'].map((v, idx) => ({
         url: '',
         altText: `Rudraksha ${mukhi} Mukhi ${v}`,
         order: idx,
@@ -160,7 +157,6 @@ function buildRudrakshaProducts() {
         inventory: 1,
         isUnique: true,
         description: 'DEMO DATA — development placeholder. Replace with real inventory.',
-        certificates: [{ labName: 'DEMO Lab', reportNumber: `DEMO-RUD-${String(n).padStart(4, '0')}` }],
         images,
       })
     }

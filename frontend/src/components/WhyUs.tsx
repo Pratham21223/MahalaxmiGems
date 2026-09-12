@@ -1,10 +1,10 @@
-import { BadgeCheck, Gem, Compass, MessageCircle } from 'lucide-react'
+import { RotateCcw, Gem, Compass, MessageCircle } from 'lucide-react'
 
 const ITEMS = [
   {
-    icon: BadgeCheck,
-    title: 'Certified & Documented',
-    text: 'Certificate details are kept close to the product information when they are available.',
+    icon: RotateCcw,
+    title: 'Easy Returns',
+    text: 'Return support is available if a stone is not right for you.',
   },
   {
     icon: Gem,

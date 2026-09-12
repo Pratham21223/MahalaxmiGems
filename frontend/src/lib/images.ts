@@ -1,4 +1,4 @@
-const VIEW_LABELS = ['front view', 'side view', 'close-up', 'certificate']
+const VIEW_LABELS = ['front view', 'side view', 'close-up']
 
 // Extract the short "view" suffix (e.g. "front view") from an image alt text.
 export function viewLabel(altText?: string): string {

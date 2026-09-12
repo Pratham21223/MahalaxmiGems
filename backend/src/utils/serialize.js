@@ -23,7 +23,6 @@ export function toPublicProduct(p) {
     inventory: p.inventory,
     isUnique: p.isUnique,
     images: p.images,
-    certificates: p.certificates,
     description: p.description,
     createdAt: p.createdAt,
   }

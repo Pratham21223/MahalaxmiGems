@@ -1,7 +1,7 @@
-import { BadgeCheck, Gem, MessageCircle } from 'lucide-react'
+import { Gem, MessageCircle, RotateCcw } from 'lucide-react'
 
 const ITEMS = [
-  { icon: BadgeCheck, title: 'Certificate Details', desc: 'Report information appears clearly when it is available.' },
+  { icon: RotateCcw, title: 'Easy Returns', desc: 'Return support is available if a purchase is not right for you.' },
   { icon: Gem, title: 'Clear Stone Facts', desc: 'Weight, origin, treatment, shape, and color are easy to compare.' },
   { icon: MessageCircle, title: 'Direct Assistance', desc: 'Ask about availability or price from the product you are viewing.' },
 ]

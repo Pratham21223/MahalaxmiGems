@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, BadgeCheck, Gem, MessageCircle, ShieldCheck } from 'lucide-react'
+import { ArrowRight, Gem, MessageCircle, RotateCcw, ShieldCheck } from 'lucide-react'
 import { HeroCategoryShowcase } from '@/components/CategoryShowcase'
 
 const TRUST = [
-  { icon: BadgeCheck, label: 'Certificate details' },
-  { icon: ShieldCheck, label: 'Clear pricing' },
+  { icon: ShieldCheck, label: 'Secure payments' },
+  { icon: RotateCcw, label: 'Easy returns' },
   { icon: MessageCircle, label: 'Personal assistance' },
 ]
 
@@ -19,12 +19,12 @@ export function Hero() {
           </div>
 
           <h1 className="text-balance mt-5 max-w-4xl text-4xl font-semibold leading-tight md:text-6xl">
-            Certified natural <span className="text-gold">gemstones</span> for confident buying
+            Natural <span className="text-gold">gemstones</span> for confident buying
           </h1>
 
           <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
             Browse natural gemstone and Rudraksha selections with clear specifications,
-            certificate details where available, and easy enquiry when you need personal guidance.
+            transparent pricing, and easy enquiry when you need personal guidance.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">

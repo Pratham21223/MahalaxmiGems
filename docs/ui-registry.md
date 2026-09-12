@@ -44,7 +44,7 @@ Last updated: 2026-08-30
 | Accent usage | `text-gold`, `bg-gold/10`, `border-gold` |
 
 **Pattern notes:**
-Use `premium-card` for repeated catalog items, review cards, and certificate cards. Product cards should surface SKU/category context, price state, and compact fact chips without adding unsupported commerce behavior. Product card galleries loop through available images on hover and keyboard focus, while keeping manual arrows and dots available.
+Use `premium-card` for repeated catalog items and review cards. Product cards should surface SKU/category context, price state, and compact fact chips without adding unsupported commerce behavior. Product card galleries loop through available images on hover and keyboard focus, while keeping manual arrows and dots available.
 
 ### Premium Panel
 
@@ -165,3 +165,22 @@ Last updated: 2026-08-30
 
 **Pattern notes:**
 Dropdown collection links should point to real collection routes, not generic search pages. Menus close on route navigation, outside click, Escape, mouse leave, and focus leaving the dropdown group. Keep dropdowns lightweight, white, and retail oriented. Avoid nested tinted panels or decorative dots. Compact numbered labels such as Rudraksha Mukhi items must use `whitespace-nowrap`.
+
+---
+
+## Transactional & admin pages - Established 2026-09-08
+
+Auth, cart, checkout, order confirmation, and admin pages follow the same
+baseline tokens with these conventions (see `frontend/src/pages/`).
+
+| Surface | Conventions |
+| --- | --- |
+| Auth/account panels | `premium-panel` form cards (`mx-auto max-w-md p-8`), full-width `rounded-full bg-primary` submit button, `text-xs font-semibold uppercase tracking-[0.18em] text-gold` eyebrow |
+| Cart/order line items | `rounded-2xl border border-slate-100 bg-white p-4 shadow-sm`, product thumb `size-20 rounded-xl bg-slate-50`, qty stepper as `rounded-full border` with p-2 icon buttons, right-aligned `font-semibold text-primary` totals |
+| Order summary aside | `h-fit rounded-2xl border ... p-6 shadow-sm lg:sticky lg:top-24`, `flex justify-between` rows, total row `border-t pt-3 font-semibold text-primary` |
+| Status chips | `rounded-full px-3 py-1 text-xs font-medium` tinted: emerald (paid/delivered), sky (processing/shipped), amber (pending), rose (cancelled/refunded) — see `lib/orderStatus.ts` |
+| Account tabs | pill buttons `rounded-full border px-4 py-2 text-sm`, active = `border-gold bg-gold/10 text-primary` |
+| Admin dashboard | tab bar `rounded-full` segmented (active = `bg-primary text-primary-foreground`), management grids `lg:grid-cols-[340px_1fr]` (form panel + list), row `rounded-xl border ... px-4 py-3 text-sm` with `Edit`/`Delete` pill actions |
+| Buy Now / Add to Cart | `rounded-full px-6 py-3 font-medium`; primary = `bg-primary text-primary-foreground`, secondary = `border border-slate-200 bg-white text-primary`; WhatsApp = `bg-[#25D366]` |
+
+**Rules:** every action button uses `focus-ring`; money is always `₹{n.toLocaleString('en-IN')}`; forms never trust client totals (server revalidates); guest checkout works without an account; `CONTACT_FOR_PRICE` products never show cart/Buy Now — only WhatsApp.

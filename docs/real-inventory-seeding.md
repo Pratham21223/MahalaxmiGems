@@ -19,12 +19,13 @@ npm run seed --workspace backend
 
 Do not use that command for real inventory.
 
-## New Real Inventory Workflow
+## Catalog Workflow (one file per gemstone)
 
-The real inventory importer lives here:
+The importer lives here:
 
-- `backend/src/seeds/inventory/index.js`
-- `backend/src/seeds/inventory/inventory.sample.js`
+- `backend/src/seeds/seedInventory.js` — the additive importer
+- `backend/src/seeds/inventory/catalog/index.js` — aggregates the gemstone files
+- `backend/src/seeds/inventory/catalog/<gemstone>.js` — one file per gemstone, each holding one sample product
 
 It is additive by default:
 
@@ -32,61 +33,85 @@ It is additive by default:
 - it creates new categories and products
 - it skips existing categories and products unless you pass `--update-existing`
 - it refuses to modify products whose SKU starts with `DEMO-`
+- it matches categories by `slug`, and products by `sku` or `slug`
 
 Sample products use `status: "DRAFT"`, so they do not appear on the customer site unless you intentionally change them to `ACTIVE`.
 
-## Create Your Editable Inventory File
+## Edit The Catalog Files
 
-Copy the sample file:
-
-```bash
-copy backend\src\seeds\inventory\inventory.sample.js backend\src\seeds\inventory\inventory.local.js
-```
-
-Edit:
+Each gemstone family has its own file:
 
 ```text
-backend/src/seeds/inventory/inventory.local.js
+backend/src/seeds/inventory/catalog/
+├── blueSapphire.js      ├── citrine.js
+├── yellowSapphire.js    ├── tourmaline.js
+├── pinkSapphire.js      ├── opal.js
+├── ruby.js              ├── tanzanite.js
+├── emerald.js           ├── iolite.js
+├── diamond.js           ├── jasper.js
+├── pearl.js             ├── lapis.js
+├── coral.js             ├── rudraksha.js
+├── catsEye.js           └── index.js
+├── hessonite.js
+├── amethyst.js
+├── aquamarine.js
+└── topaz.js
 ```
 
-The `.local.js` file is ignored by git because it may contain private stock, prices, and certificate details.
+Everything in those files is placeholder data. To add stock, duplicate the sample product object inside the relevant file and replace the values with real details. Keep `sku` and `slug` unique — the aggregator refuses to load duplicate values.
+
+To add a new gemstone family, create `<gemstone>.js` next to them and register it in `catalog/index.js`.
+
+If you would rather keep private inventory in a single file, the importer still accepts `--file`:
+
+```bash
+npm run seed:catalog -- --file src/seeds/inventory/<your-file>.js
+```
 
 ## Dry Run First
 
-Dry run checks the file and shows what would happen without writing to MongoDB:
+Dry run shows what would happen without writing to MongoDB:
 
 ```bash
-npm run seed:inventory -- --file src/seeds/inventory/inventory.local.js --dry-run
+npm run seed:catalog --workspace backend -- --dry-run
 ```
 
-If you prefer the backend workspace command directly:
+The short root form also works:
 
 ```bash
-npm run seed:inventory --workspace backend -- --file src/seeds/inventory/inventory.local.js --dry-run
+npm run seed:catalog -- --dry-run
 ```
+
+Both forms forward `--file` / `--dry-run` / `--update-existing` to the importer,
+and the importer prints the source it resolved. Always confirm the printed source
+and the summary table before dropping `--dry-run`.
+
+> Warning: never call the importer with args on a script that does not end in
+> `--`. npm then treats `--file` as an npm config flag, silently falls back to
+> the default source, and runs in **write** mode.
 
 ## Import New Records
 
 Run the import:
 
 ```bash
-npm run seed:inventory -- --file src/seeds/inventory/inventory.local.js
+npm run seed:catalog
 ```
 
 By default, existing matching records are skipped.
 
 ## Update Existing Real Records
 
-If you intentionally want to update products or categories already imported from your real inventory file, run:
+If you intentionally want to update products or categories already imported, run:
 
 ```bash
-npm run seed:inventory -- --file src/seeds/inventory/inventory.local.js --update-existing
+npm run seed:catalog -- --update-existing
 ```
 
-Matching is based on:
+Two things worth knowing about `--update-existing`:
 
-- category `slug`
-- product `sku` or `slug`
+- It also updates every category listed in the gemstone files. `topaz.js` lists `blue-topaz` so it can re-parent it under the new `topaz` parent — that re-parent is applied on this run.
+- It overwrites the fields present in the catalog file, so edits made only in the admin UI are reset to the catalog values.
 
 Use stable SKUs. Do not reuse any `DEMO-` SKU for real inventory.
 
@@ -113,16 +138,18 @@ Example:
 ```js
 export const categories = [
   {
-    name: 'Premium Blue Sapphire',
-    slug: 'premium-blue-sapphire',
-    parentSlug: 'sapphire',
-    description: 'Selected blue sapphire stones for customers comparing color, origin, and certification.',
-    seoTitle: 'Premium Blue Sapphire Gemstones',
-    seoDescription: 'Browse selected blue sapphire gemstones with clear product details.',
+    name: "Premium Blue Sapphire",
+    slug: "premium-blue-sapphire",
+    parentSlug: "sapphire",
+    description:
+      "Selected blue sapphire stones for customers comparing color, origin, and certification.",
+    seoTitle: "Premium Blue Sapphire Gemstones",
+    seoDescription:
+      "Browse selected blue sapphire gemstones with clear product details.",
     active: true,
     order: 101,
   },
-]
+];
 ```
 
 `parentSlug` must point to an existing category slug or to another category in the same file that has already been imported.
@@ -157,7 +184,6 @@ Important fields used by the website:
 - `isUnique`
 - `status`
 - `images`
-- `certificates`
 - `seoTitle`
 - `seoDescription`
 
@@ -188,9 +214,8 @@ Example:
   isUnique: true,
   status: 'DRAFT',
   images: [],
-  certificates: [],
   seoTitle: 'Blue Sapphire 2.35 Carat',
-  seoDescription: 'Blue Sapphire 2.35 carat with product details and certificate information.',
+  seoDescription: 'Blue Sapphire 2.35 carat with product details and specifications.',
 }
 ```
 
@@ -225,7 +250,6 @@ Example:
   isUnique: false,
   status: 'DRAFT',
   images: [],
-  certificates: [],
 }
 ```
 
@@ -238,21 +262,21 @@ Use 3 or 4 images when possible:
 ```js
 images: [
   {
-    url: '/uploads/products/blue-sapphire-2-35-front.jpg',
-    altText: 'Blue Sapphire 2.35 carat front view',
+    url: "/uploads/products/blue-sapphire-2-35-front.jpg",
+    altText: "Blue Sapphire 2.35 carat front view",
     order: 0,
   },
   {
-    url: '/uploads/products/blue-sapphire-2-35-side.jpg',
-    altText: 'Blue Sapphire 2.35 carat side view',
+    url: "/uploads/products/blue-sapphire-2-35-side.jpg",
+    altText: "Blue Sapphire 2.35 carat side view",
     order: 1,
   },
   {
-    url: '/uploads/products/blue-sapphire-2-35-close-up.jpg',
-    altText: 'Blue Sapphire 2.35 carat close-up',
+    url: "/uploads/products/blue-sapphire-2-35-close-up.jpg",
+    altText: "Blue Sapphire 2.35 carat close-up",
     order: 2,
   },
-]
+];
 ```
 
 If `url` is empty, the frontend shows the existing placeholder view. `altText` is required.
@@ -284,25 +308,6 @@ pricing: { type: 'PER_CARAT', amount: 45000, currency: 'INR' },
 priceState: 'PUBLIC_PRICE',
 ```
 
-## Certificates
-
-Certificates are stored inside each product:
-
-```js
-certificates: [
-  {
-    labName: 'GIA',
-    reportNumber: 'REAL-REPORT-NUMBER',
-    issueDate: '2026-08-30',
-    verificationUrl: 'https://example.com/real-verification-url',
-    verificationStatus: 'Verified',
-    documentRef: '/uploads/certificates/mg-bs-0001.pdf',
-  },
-]
-```
-
-Do not enter certificate values unless they are real.
-
 ## Verify Imports
 
 After importing, start the backend and frontend:
@@ -314,8 +319,8 @@ npm run dev
 Check MongoDB directly:
 
 ```js
-db.categories.find({ slug: 'premium-blue-sapphire' })
-db.products.find({ sku: 'MG-BS-0001' })
+db.categories.find({ slug: "blue-sapphire" });
+db.products.find({ sku: "MG-BS-0001" });
 ```
 
 Check the public API:
@@ -327,10 +332,10 @@ http://localhost:4000/api/products
 
 Only `ACTIVE` products appear in public product APIs. If your imported product is `DRAFT`, that is expected.
 
-To publish a product, change `status` to `"ACTIVE"` in your inventory file and rerun:
+To publish a product, change `status` to `"ACTIVE"` in its catalog file and rerun:
 
 ```bash
-npm run seed:inventory -- --file src/seeds/inventory/inventory.local.js --update-existing
+npm run seed:catalog -- --update-existing
 ```
 
 ## Future CSV Or Excel Imports
@@ -350,7 +355,7 @@ For now, demo products remain untouched.
 
 When your real inventory is ready:
 
-1. add real categories and products in `inventory.local.js`
+1. replace the placeholder products in `src/seeds/inventory/catalog/*.js` with real stones
 2. import them as `DRAFT`
 3. verify them in MongoDB
 4. set selected products to `ACTIVE`

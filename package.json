@@ -12,7 +12,7 @@
     "dev": "concurrently -n client,server -c cyan,magenta \"npm run dev:client\" \"npm run dev:server\"",
     "build": "npm run build --workspace frontend && npm run build --workspace backend",
     "lint": "npm run lint --workspace frontend && npm run lint --workspace backend",
-    "seed:inventory": "npm run seed:inventory --workspace backend"
+    "seed:catalog": "npm run seed:catalog --workspace backend --"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
