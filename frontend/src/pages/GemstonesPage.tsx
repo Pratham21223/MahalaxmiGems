@@ -29,7 +29,7 @@ export function GemstonesPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">Shop gemstones</p>
         <h1 className="mt-1 text-3xl font-semibold text-primary md:text-4xl">Gemstone Collection</h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
-          Discover our curated collection of certified natural gemstones across every major variety.
+          Discover our curated collection of natural gemstones across every major variety.
         </p>
       </header>
 

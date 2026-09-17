@@ -7,6 +7,8 @@ build/
 frontend/dist/
 backend/dist/
 
+docs/*
+
 # Environment files (never commit secrets)
 .env
 .env.*

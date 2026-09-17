@@ -17,3 +17,12 @@ export const globalLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'Too many requests, please slow down' },
 })
+
+// Contact form: low hourly cap per IP to deter spam (honeypot is the first line).
+export const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many messages sent, please try again later' },
+})

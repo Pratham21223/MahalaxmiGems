@@ -7,22 +7,32 @@ import {
   adminDeleteCategory,
   adminDeleteProduct,
   adminGetCategories,
+  adminListContactMessages,
   adminListOrders,
   adminListProducts,
   adminUpdateCategory,
+  adminUpdateContactStatus,
+  adminUpdateOrderLabStatus,
   adminUpdateOrderStatus,
   adminUpdateProduct,
 } from '@/lib/api'
-import type { AdminCategory, AdminProduct, Order } from '@/lib/types'
+import type { AdminCategory, AdminProduct, ContactMessage, LabReportStatus, Order } from '@/lib/types'
 import type { AdminProductInput } from '@/lib/api'
 import { ORDER_STATUS_LABELS, formatOrderDate, orderStatusClass } from '@/lib/orderStatus'
 import { Loading } from '@/components/Status'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
-type Tab = 'orders' | 'categories' | 'products'
+type Tab = 'orders' | 'categories' | 'products' | 'messages'
 
 const PRODUCT_STATUSES = ['DRAFT', 'ACTIVE', 'ON_HOLD', 'SOLD', 'ARCHIVED'] as const
+
+const LAB_STATUS_LABELS: Record<LabReportStatus, string> = {
+  NONE: 'No report',
+  REQUESTED: 'Requested',
+  SENT_TO_LAB: 'Sent to lab',
+  REPORT_RECEIVED: 'Report received',
+}
 
 export function AdminPage() {
   const { user, loading } = useAuth()
@@ -43,7 +53,7 @@ export function AdminPage() {
       </div>
 
       <div className="flex gap-2 overflow-x-auto border-b border-slate-100 pb-3">
-        {(['orders', 'categories', 'products'] as Tab[]).map((t) => (
+        {(['orders', 'categories', 'products', 'messages'] as Tab[]).map((t) => (
           <button
             key={t}
             type="button"
@@ -61,6 +71,7 @@ export function AdminPage() {
       {tab === 'orders' && <OrdersTab />}
       {tab === 'categories' && <CategoriesTab />}
       {tab === 'products' && <ProductsTab />}
+      {tab === 'messages' && <MessagesTab />}
     </div>
   )
 }
@@ -124,6 +135,29 @@ function OrdersTab() {
               <p className="mt-1 text-xs text-muted-foreground">
                 {order.items.map((i) => `${i.name} × ${i.qty}`).join(', ')}
               </p>
+              {order.labReport?.lab && (
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-gold/10 px-3 py-1 text-xs font-medium text-primary">
+                    {order.labReport.label}
+                  </span>
+                  <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    Lab status
+                    <select
+                      value={order.labReport.status}
+                      onChange={async (e) => {
+                        await adminUpdateOrderLabStatus(order.reference, e.target.value as LabReportStatus)
+                        fetchOrders()
+                      }}
+                      aria-label={`Lab report status for order ${order.reference.slice(0, 8)}`}
+                      className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs focus:border-gold focus:ring-2 focus:ring-gold/15 focus:outline-none"
+                    >
+                      <option value="REQUESTED">{LAB_STATUS_LABELS.REQUESTED}</option>
+                      <option value="SENT_TO_LAB">{LAB_STATUS_LABELS.SENT_TO_LAB}</option>
+                      <option value="REPORT_RECEIVED">{LAB_STATUS_LABELS.REPORT_RECEIVED}</option>
+                    </select>
+                  </label>
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <span className={cn('rounded-full px-3 py-1 text-xs font-medium', orderStatusClass(order.status))}>
@@ -145,6 +179,96 @@ function OrdersTab() {
           </div>
         </div>
       ))}
+    </div>
+  )
+}
+
+// ---- Messages -------------------------------------------------------------
+
+function MessagesTab() {
+  const [messages, setMessages] = useState<ContactMessage[]>([])
+  const [loading, setLoading] = useState(true)
+  const [openId, setOpenId] = useState('')
+
+  useEffect(() => {
+    let active = true
+    adminListContactMessages({ limit: 50 })
+      .then(({ items }) => {
+        if (active) setMessages(items)
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const toggleStatus = async (message: ContactMessage) => {
+    const next = message.status === 'NEW' ? 'READ' : 'NEW'
+    const { item } = await adminUpdateContactStatus(message._id, next)
+    setMessages((list) => list.map((m) => (m._id === item._id ? item : m)))
+  }
+
+  if (loading) return <Loading />
+
+  if (messages.length === 0) {
+    return <p className="py-10 text-center text-sm text-muted-foreground">No contact messages yet.</p>
+  }
+
+  return (
+    <div className="space-y-3">
+      {messages.map((message) => {
+        const open = openId === message._id
+        return (
+          <div key={message._id} className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-medium text-primary">{message.subject}</p>
+                <p className="text-xs text-muted-foreground">
+                  {message.name} · {message.email}
+                  {message.phone ? ` · ${message.phone}` : ''} · {formatOrderDate(message.createdAt)}
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className={cn(
+                    'rounded-full px-3 py-1 text-xs font-medium',
+                    message.status === 'NEW' ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700',
+                  )}
+                >
+                  {message.status === 'NEW' ? 'New' : 'Read'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setOpenId(open ? '' : message._id)}
+                  className="focus-ring rounded-full border border-slate-200 px-4 py-1.5 text-xs font-medium text-primary"
+                >
+                  {open ? 'Hide' : 'View'}
+                </button>
+                <a
+                  href={`mailto:${message.email}?subject=${encodeURIComponent(`Re: ${message.subject}`)}`}
+                  className="focus-ring rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground"
+                >
+                  Reply
+                </a>
+                <button
+                  type="button"
+                  onClick={() => toggleStatus(message)}
+                  className="focus-ring rounded-full border border-slate-200 px-4 py-1.5 text-xs font-medium text-muted-foreground"
+                >
+                  Mark {message.status === 'NEW' ? 'read' : 'unread'}
+                </button>
+              </div>
+            </div>
+            {open && (
+              <p className="mt-3 whitespace-pre-wrap border-t border-slate-100 pt-3 text-sm leading-6 text-muted-foreground">
+                {message.message}
+              </p>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

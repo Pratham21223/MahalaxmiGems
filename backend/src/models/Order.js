@@ -48,6 +48,20 @@ const orderSchema = new mongoose.Schema(
 
     items: { type: [orderItemSchema], default: [] },
 
+    // Optional laboratory report requested by the customer at checkout.
+    // Snapshot only: all labs are currently free (fee 0), but the field is kept
+    // so future paid options stay server-authoritative.
+    labReport: {
+      lab: { type: String, default: '' },
+      label: { type: String, default: '' },
+      fee: { type: Number, default: 0 },
+      status: {
+        type: String,
+        enum: ['NONE', 'REQUESTED', 'SENT_TO_LAB', 'REPORT_RECEIVED'],
+        default: 'NONE',
+      },
+    },
+
     subtotal: { type: Number, required: true },
     shippingAmount: { type: Number, default: 0 },
     total: { type: Number, required: true },

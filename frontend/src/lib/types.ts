@@ -165,6 +165,32 @@ export interface ShippingAddress {
   country: string
 }
 
+export interface LabOption {
+  id: string
+  label: string
+  fee: number
+}
+
+export type LabReportStatus = 'NONE' | 'REQUESTED' | 'SENT_TO_LAB' | 'REPORT_RECEIVED'
+
+export interface LabReport {
+  lab: string
+  label: string
+  fee: number
+  status: LabReportStatus
+}
+
+export interface ContactMessage {
+  _id: string
+  name: string
+  email: string
+  phone?: string
+  subject: string
+  message: string
+  status: 'NEW' | 'READ'
+  createdAt: string
+}
+
 export interface Order {
   reference: string
   status: OrderStatus
@@ -175,6 +201,7 @@ export interface Order {
   total: number
   currency: string
   shippingAddress: ShippingAddress
+  labReport?: LabReport
   payment: { provider: string; razorpayOrderId: string; method: string }
   createdAt: string
   updatedAt: string

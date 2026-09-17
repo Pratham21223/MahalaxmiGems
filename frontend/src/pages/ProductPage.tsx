@@ -11,6 +11,7 @@ import { ReviewSection } from '@/components/ReviewSection'
 import { WishlistButton } from '@/components/WishlistButton'
 import { Loading, ErrorState } from '@/components/Status'
 import { AddToCartButton, BuyNowButton } from '@/components/PurchaseActions'
+import { waLink } from '@/lib/businessInfo'
 
 function SpecRow({ label, value }: { label: string; value?: string | number | null }) {
   if (value === undefined || value === null || value === '') return null
@@ -41,7 +42,7 @@ export function ProductPage() {
   ]
 
   const message = `I'm interested in ${product.name} (SKU: ${product.sku}${product.weightCarat ? `, ${product.weightCarat} carat` : ''}) — ${window.location.href}`
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
+  const whatsappUrl = waLink(message)
   const inStock = product.inventory > 0
   const relatedItems = (related.data?.items || []).filter((p) => p.id !== product.id)
   const description = (product.description || '').trim()

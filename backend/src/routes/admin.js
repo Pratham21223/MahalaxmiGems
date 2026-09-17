@@ -14,10 +14,17 @@ import {
   adminListOrders,
   adminGetOrder,
   adminUpdateOrderStatus,
+  adminUpdateLabReportStatus,
   validateCategory,
   validateProduct,
   validateOrderStatus,
+  validateLabReportStatus,
 } from '../controllers/adminController.js'
+import {
+  adminListContactMessages,
+  adminUpdateContactStatus,
+  validateContactStatus,
+} from '../controllers/contactController.js'
 
 export const adminRouter = Router()
 
@@ -37,3 +44,7 @@ adminRouter.delete('/products/:id', asyncHandler(adminDeleteProduct))
 adminRouter.get('/orders', asyncHandler(adminListOrders))
 adminRouter.get('/orders/:reference', asyncHandler(adminGetOrder))
 adminRouter.patch('/orders/:reference/status', validateOrderStatus, asyncHandler(adminUpdateOrderStatus))
+adminRouter.patch('/orders/:reference/lab-report', validateLabReportStatus, asyncHandler(adminUpdateLabReportStatus))
+
+adminRouter.get('/contact-messages', asyncHandler(adminListContactMessages))
+adminRouter.patch('/contact-messages/:id/status', validateContactStatus, asyncHandler(adminUpdateContactStatus))

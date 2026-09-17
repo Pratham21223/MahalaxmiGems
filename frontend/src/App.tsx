@@ -12,6 +12,15 @@ const GemSuggestionsPage = lazy(() => import('@/pages/GemSuggestionsPage').then(
 const AboutPage = lazy(() => import('@/pages/AboutPage').then((m) => ({ default: m.AboutPage })))
 const GemstonesPage = lazy(() => import('@/pages/GemstonesPage').then((m) => ({ default: m.GemstonesPage })))
 const RudrakshaPage = lazy(() => import('@/pages/RudrakshaPage').then((m) => ({ default: m.RudrakshaPage })))
+const LocationPage = lazy(() => import('@/pages/LocationPage').then((m) => ({ default: m.LocationPage })))
+const FaqPage = lazy(() => import('@/pages/FaqPage').then((m) => ({ default: m.FaqPage })))
+const BuyingGuidePage = lazy(() => import('@/pages/BuyingGuidePage').then((m) => ({ default: m.BuyingGuidePage })))
+const RingSizeGuidePage = lazy(() => import('@/pages/RingSizeGuidePage').then((m) => ({ default: m.RingSizeGuidePage })))
+const PackagingPage = lazy(() => import('@/pages/PackagingPage').then((m) => ({ default: m.PackagingPage })))
+const ShippingPolicyPage = lazy(() => import('@/pages/ShippingPolicyPage').then((m) => ({ default: m.ShippingPolicyPage })))
+const ReturnExchangePage = lazy(() => import('@/pages/ReturnExchangePage').then((m) => ({ default: m.ReturnExchangePage })))
+const PaymentMethodsPage = lazy(() => import('@/pages/PaymentMethodsPage').then((m) => ({ default: m.PaymentMethodsPage })))
+const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })))
 const NotFound = lazy(() => import('@/pages/NotFound').then((m) => ({ default: m.NotFound })))
 const LoginPage = lazy(() => import('@/pages/LoginPage').then((m) => ({ default: m.LoginPage })))
 const RegisterPage = lazy(() => import('@/pages/RegisterPage').then((m) => ({ default: m.RegisterPage })))
@@ -52,6 +61,15 @@ export default function App() {
           <Route path="/gemstones" element={<GemstonesPage />} />
           <Route path="/rudraksha" element={<RudrakshaPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/location" element={<LocationPage />} />
+          <Route path="/faqs" element={<FaqPage />} />
+          <Route path="/gemstone-buying-guide" element={<BuyingGuidePage />} />
+          <Route path="/ring-size-guide" element={<RingSizeGuidePage />} />
+          <Route path="/packaging" element={<PackagingPage />} />
+          <Route path="/shipping-policy" element={<ShippingPolicyPage />} />
+          <Route path="/return-exchange" element={<ReturnExchangePage />} />
+          <Route path="/payment-methods" element={<PaymentMethodsPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/account" element={<AccountPage />} />

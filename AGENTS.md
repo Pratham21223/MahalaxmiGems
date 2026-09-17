@@ -27,8 +27,13 @@ Razorpay test-mode keys + `ADMIN_EMAIL`/`ADMIN_PASSWORD` are set in
 Routes live in `frontend/src/App.tsx` (pages lazy-loaded). Customer: `/`,
 `/categories/:slug`, `/products/:id`, `/search`, `/gemstones`, `/rudraksha`,
 `/about`, `/contact`, `/gem-suggestions`, `/login`, `/register`, `/account`,
-`/cart`, `/checkout`, `/order/:reference`, 404. Admin is one tabbed `/admin`
-page — there are no `/admin/*` subroutes.
+`/cart`, `/checkout`, `/order/:reference`, 404. Info/policy pages:
+`/location`, `/faqs`, `/gemstone-buying-guide`, `/ring-size-guide`,
+`/packaging`, `/shipping-policy`, `/return-exchange`, `/payment-methods`,
+`/privacy-policy`. Admin is one tabbed `/admin` page (orders, categories,
+products, messages) — there are no `/admin/*` subroutes. Owner-confirmed
+contact/policy facts live in `frontend/src/lib/businessInfo.ts` (single source
+consumed by the info/FAQ/policy pages); change values there, not per page.
 
 ## Commands (from repo root)
 
@@ -127,15 +132,20 @@ page — there are no `/admin/*` subroutes.
   `GET /api/search/suggest?q=&limit=` · `GET /api/reviews` ·
   `POST /api/reviews` (auth; name comes from the session user)
 - `POST /api/auth/register|login|logout` · `GET /api/auth/me`
+- `GET /api/labs` (checkout lab-report options) · `POST /api/contact`
+  (public, Zod + honeypot + rate limit; contact form on `/contact`)
 - `GET/POST /api/cart` · `PATCH|DELETE /api/cart/:productId` (guest + logged-in;
   server-computed totals)
 - `GET/POST /api/wishlist` · `DELETE /api/wishlist/:productId` (auth)
-- `POST /api/orders` (guest or auth; `items` optional = Buy Now) ·
-  `GET /api/orders` (auth) · `GET /api/orders/:reference` (owner/guest) ·
+- `POST /api/orders` (guest or auth; `items` optional = Buy Now; optional
+  `labReport: { lab }` selection, all labs free, snapshot + admin status)
+  · `GET /api/orders` (auth) · `GET /api/orders/:reference` (owner/guest) ·
   `POST /api/orders/:reference/confirm|cancel` · `POST /api/orders/webhook`
   (raw body)
 - `/api/admin/*` (admin): categories/products CRUD · `GET /admin/orders` ·
-  `GET /admin/orders/:reference` · `PATCH /admin/orders/:reference/status`
+  `GET /admin/orders/:reference` · `PATCH /admin/orders/:reference/status` ·
+  `PATCH /admin/orders/:reference/lab-report` ·
+  `GET /admin/contact-messages` · `PATCH /admin/contact-messages/:id/status`
 
 ## Config / env
 

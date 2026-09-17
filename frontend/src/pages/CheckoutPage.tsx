@@ -3,11 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ShieldCheck } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
-import { createCheckout, confirmPayment, cancelOrder, getProduct } from '@/lib/api'
-import type { CheckoutResult, ShippingAddress } from '@/lib/types'
+import { createCheckout, confirmPayment, cancelOrder, getProduct, getLabs } from '@/lib/api'
+import type { CheckoutResult, LabOption, ShippingAddress } from '@/lib/types'
 import { Input } from '@/components/ui/input'
 import { Loading } from '@/components/Status'
 import { apiErrorMessage } from '@/lib/errors'
+import { cn } from '@/lib/utils'
 
 declare global {
   interface Window {
@@ -48,17 +49,34 @@ export function CheckoutPage() {
   const buyQty = Number(params.get('qty') || 1)
 
   const [address, setAddress] = useState<ShippingAddress>(EMPTY_ADDRESS)
-  const [buyProduct, setBuyProduct] = useState<{ id: string; name: string; price: number | null } | null>(null)
+  const [buyProduct, setBuyProduct] = useState<{ id: string; name: string; unit: number | null } | null>(null)
+  const [labs, setLabs] = useState<LabOption[]>([])
+  const [lab, setLab] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     if (buyId) {
       getProduct(buyId)
-        .then((p) => setBuyProduct({ id: p.id, name: p.name, price: p.price?.amount ?? null }))
+        .then((p) => {
+          // PER_CARAT pricing is a rate; multiply by the stone's carat weight so
+          // the displayed estimate matches the server's authoritative unit price.
+          const unit = p.price
+            ? p.price.type === 'PER_CARAT'
+              ? p.price.amount * (p.weightCarat || 0)
+              : p.price.amount
+            : null
+          setBuyProduct({ id: p.id, name: p.name, unit })
+        })
         .catch(() => setError('Product is no longer available'))
     }
   }, [buyId])
+
+  useEffect(() => {
+    getLabs()
+      .then(({ items }) => setLabs(items))
+      .catch(() => setLabs([]))
+  }, [])
 
   // Logged-in users only need to fill the address — name/email come from the account.
   useEffect(() => {
@@ -71,7 +89,7 @@ export function CheckoutPage() {
   const isBuyNow = buyId !== ''
   const items = isBuyNow ? [{ productId: buyId, qty: buyQty }] : (cart?.items ?? []).map((i) => ({ productId: i.productId, qty: i.qty }))
   const estimatedTotal = isBuyNow
-    ? (buyProduct?.price ?? 0) * buyQty
+    ? (buyProduct?.unit ?? 0) * buyQty
     : cart?.total ?? 0
 
   const set = (field: keyof ShippingAddress) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -82,7 +100,11 @@ export function CheckoutPage() {
     setError('')
     setSubmitting(true)
     try {
-      const result: CheckoutResult = await createCheckout({ shippingAddress: address, items })
+      const result: CheckoutResult = await createCheckout({
+        shippingAddress: address,
+        items,
+        ...(lab ? { labReport: { lab } } : {}),
+      })
       await runPayment(result)
       await refresh()
     } catch (err) {
@@ -157,8 +179,9 @@ export function CheckoutPage() {
       </div>
 
       <form onSubmit={onSubmit} className="grid gap-6 lg:grid-cols-[1fr_360px]" noValidate>
-        <div className="premium-panel rounded-2xl p-6">
-          <h2 className="text-lg font-semibold text-primary">Shipping details</h2>
+        <div className="space-y-6">
+          <div className="premium-panel rounded-2xl p-6">
+            <h2 className="text-lg font-semibold text-primary">Shipping details</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <label className="block text-sm font-medium text-foreground sm:col-span-2">
               Full name <Input value={address.name} onChange={set('name')} required autoComplete="name" className="mt-1.5" />
@@ -184,6 +207,61 @@ export function CheckoutPage() {
             <label className="block text-sm font-medium text-foreground">
               Country <Input value={address.country} onChange={set('country')} required autoComplete="country-name" className="mt-1.5" />
             </label>
+            </div>
+          </div>
+
+          <div className="premium-panel rounded-2xl p-6">
+            <h2 className="text-lg font-semibold text-primary">Lab report (optional)</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Choose a laboratory and the report is provided with your delivered order. Any one
+              laboratory is free.
+            </p>
+            <div className="mt-4 space-y-2">
+              <label
+                className={cn(
+                  'flex cursor-pointer items-center gap-3 rounded-xl border p-3 text-sm transition',
+                  lab === ''
+                    ? 'border-gold bg-gold/5 text-primary'
+                    : 'border-slate-200 bg-white text-foreground hover:border-gold/50',
+                )}
+              >
+                <input
+                  type="radio"
+                  name="lab-report"
+                  value=""
+                  checked={lab === ''}
+                  onChange={() => setLab('')}
+                  className="size-4 accent-[#c9a24b]"
+                />
+                <span className="font-medium">No laboratory report</span>
+              </label>
+              {labs.map((option) => (
+                <label
+                  key={option.id}
+                  className={cn(
+                    'flex cursor-pointer items-center gap-3 rounded-xl border p-3 text-sm transition',
+                    lab === option.id
+                      ? 'border-gold bg-gold/5 text-primary'
+                      : 'border-slate-200 bg-white text-foreground hover:border-gold/50',
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="lab-report"
+                    value={option.id}
+                    checked={lab === option.id}
+                    onChange={() => setLab(option.id)}
+                    className="size-4 accent-[#c9a24b]"
+                  />
+                  <span className="font-medium">{option.label}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">Included</span>
+                </label>
+              ))}
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              If a requested laboratory report needs additional time, we will contact you before
+              dispatch.
+            </p>
           </div>
         </div>
 
@@ -212,6 +290,11 @@ export function CheckoutPage() {
             <div className="flex justify-between text-muted-foreground">
               <span>Shipping</span><span className="font-medium text-foreground">Free</span>
             </div>
+            {lab && (
+              <div className="flex justify-between text-muted-foreground">
+                <span>Lab report</span><span className="font-medium text-foreground">Included</span>
+              </div>
+            )}
             <div className="flex justify-between text-base font-semibold text-primary">
               <span>Total</span><span>₹{estimatedTotal.toLocaleString('en-IN')}</span>
             </div>

@@ -24,6 +24,8 @@ import { cartRouter } from './routes/cart.js'
 import { wishlistRouter } from './routes/wishlist.js'
 import { ordersRouter } from './routes/orders.js'
 import { adminRouter } from './routes/admin.js'
+import { labsRouter } from './routes/labs.js'
+import { contactRouter } from './routes/contact.js'
 
 // Defense-in-depth note: `mongoose.set('sanitizeFilter', true)` is intentionally
 // NOT used — on this Mongoose version it breaks casting of operator range queries
@@ -36,7 +38,7 @@ import { adminRouter } from './routes/admin.js'
 // process exits cleanly when Mongoose disconnects).
 export function createApp() {
   const app = express()
-  app.disable('x-powered-by')
+  app.disable('x-powered-by') //hides which framework is used for browsers
 
   // Security headers. Strict CSP is enforced in production; it is disabled in
   // dev so Vite's HMR (inline scripts + websocket) keeps working.
@@ -109,6 +111,8 @@ export function createApp() {
   app.use('/api/wishlist', wishlistRouter)
   app.use('/api/orders', ordersRouter)
   app.use('/api/admin', adminRouter)
+  app.use('/api/labs', labsRouter)
+  app.use('/api/contact', contactRouter)
 
   app.use(notFound)
   app.use(errorHandler)

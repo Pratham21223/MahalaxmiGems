@@ -86,6 +86,11 @@ export function OrderConfirmationPage() {
               {order.shippingAddress.state} {order.shippingAddress.postalCode}<br />
               {order.shippingAddress.country}<br />
               {order.shippingAddress.phone}</p>
+            {order.labReport?.lab && (
+              <p className="border-t border-slate-100 pt-3 text-muted-foreground">
+                Lab report: <span className="font-medium text-foreground">{order.labReport.label}</span>
+              </p>
+            )}
             <div className="flex justify-between border-t border-slate-100 pt-3 text-base font-semibold text-primary">
               <span>Total</span><span>₹{order.total.toLocaleString('en-IN')}</span>
             </div>

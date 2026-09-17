@@ -12,6 +12,7 @@ import {
 } from '../services/razorpay.js'
 import { validate } from '../middlewares/validate.js'
 import { checkoutSchema } from '../schemas.js'
+import { getLab } from '../config/labReports.js'
 import { env } from '../config/index.js'
 import { logger } from '../config/logger.js'
 
@@ -47,6 +48,7 @@ function toOrderPublic(o) {
     total: o.total,
     currency: o.currency,
     shippingAddress: o.shippingAddress,
+    labReport: o.labReport || { lab: '', label: '', fee: 0, status: 'NONE' },
     payment: {
       provider: o.payment?.provider,
       razorpayOrderId: o.payment?.razorpayOrderId,
@@ -77,7 +79,7 @@ async function orderItemsFromRequest(req, res) {
 }
 
 export async function createCheckout(req, res) {
-  const { shippingAddress } = res.locals.validated
+  const { shippingAddress, labReport } = res.locals.validated
   const { items, owner } = await orderItemsFromRequest(req, res)
 
   if (!items.length) {
@@ -126,6 +128,16 @@ export async function createCheckout(req, res) {
       total,
       currency: 'INR',
       shippingAddress,
+      ...(labReport
+        ? {
+            labReport: {
+              lab: labReport.lab,
+              label: getLab(labReport.lab)?.label || labReport.lab,
+              fee: getLab(labReport.lab)?.fee || 0,
+              status: 'REQUESTED',
+            },
+          }
+        : {}),
     })
     order.payment.razorpayOrderId = rzpOrder.id
     await order.save()

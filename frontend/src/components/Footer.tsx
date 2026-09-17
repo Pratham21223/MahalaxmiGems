@@ -4,7 +4,7 @@ import { ArrowRight, Gem, MessageCircle } from 'lucide-react'
 const COLUMNS: { title: string; items: string[] }[] = [
   {
     title: 'Our Company',
-    items: ['About Us', 'Testimonials', 'Blog', 'Our Location', 'Contact Us'],
+    items: ['About Us', 'Our Location', 'Contact Us'],
   },
   {
     title: 'Information',
@@ -16,11 +16,22 @@ const COLUMNS: { title: string; items: string[] }[] = [
   },
 ]
 
-// Routes for links that exist today; the rest remain placeholders → /contact.
+const HREFS: Record<string, string> = {
+  'About Us': '/about',
+  'Our Location': '/location',
+  'Contact Us': '/contact',
+  FAQs: '/faqs',
+  'Gemstone Buying Guide': '/gemstone-buying-guide',
+  'Ring Size Guide': '/ring-size-guide',
+  'Packaging & Insert': '/packaging',
+  'Shipping Policy': '/shipping-policy',
+  'Return & Exchange': '/return-exchange',
+  'Payment Methods': '/payment-methods',
+  'Privacy Policy': '/privacy-policy',
+}
+
 function itemHref(item: string): string {
-  if (item === 'About Us') return '/about'
-  if (item === 'Contact Us') return '/contact'
-  return '/contact'
+  return HREFS[item] ?? '/contact'
 }
 
 export function Footer() {
@@ -35,7 +46,7 @@ export function Footer() {
             <span className="text-lg font-semibold">Mahalaxmi Gems</span>
           </div>
           <p className="mt-4 max-w-sm text-sm leading-6 text-white/70">
-            Certified natural gemstones and Rudraksha presented with clear product details and easy enquiry paths.
+            Natural gemstones and Rudraksha presented with clear product details and easy enquiry paths.
           </p>
           <Link
             to="/contact"
@@ -67,7 +78,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="page-shell flex flex-col gap-2 py-5 text-sm text-white/60 sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} Mahalaxmi Gems.</span>
-          <span>Product images and final store policies will be added by the owner.</span>
+          <span>Serving customers since the 1980s.</span>
         </div>
       </div>
     </footer>

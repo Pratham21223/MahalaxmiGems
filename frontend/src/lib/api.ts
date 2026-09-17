@@ -5,6 +5,9 @@ import type {
   Cart,
   Category,
   CheckoutResult,
+  ContactMessage,
+  LabOption,
+  LabReportStatus,
   Order,
   Product,
   ProductList,
@@ -157,6 +160,7 @@ export async function removeWishlist(productId: string): Promise<{ items: string
 export async function createCheckout(input: {
   shippingAddress: ShippingAddress
   items?: { productId: string; qty: number }[]
+  labReport?: { lab: string }
 }): Promise<CheckoutResult> {
   const { data } = await client.post('/orders', input)
   return data
@@ -182,6 +186,27 @@ export async function getMyOrders(): Promise<{ orders: Order[] }> {
 
 export async function cancelOrder(reference: string): Promise<{ order: Order }> {
   const { data } = await client.post(`/orders/${reference}/cancel`)
+  return data
+}
+
+// ---- Lab reports & contact -----------------------------------------------
+
+export async function getLabs(): Promise<{ items: LabOption[] }> {
+  const { data } = await client.get('/labs')
+  return data
+}
+
+export interface ContactInput {
+  name: string
+  email: string
+  phone?: string
+  subject: string
+  message: string
+  website?: string
+}
+
+export async function submitContact(input: ContactInput): Promise<{ ok: boolean }> {
+  const { data } = await client.post('/contact', input)
   return data
 }
 
@@ -270,4 +295,23 @@ export async function adminListOrders(params: {
 export async function adminUpdateOrderStatus(reference: string, status: Order['status']) {
   const { data } = await client.patch(`/admin/orders/${reference}/status`, { status })
   return data as { item: Order }
+}
+
+export async function adminUpdateOrderLabStatus(reference: string, status: LabReportStatus) {
+  const { data } = await client.patch(`/admin/orders/${reference}/lab-report`, { status })
+  return data as { item: Order }
+}
+
+export async function adminListContactMessages(params: {
+  status?: string
+  page?: number
+  limit?: number
+} = {}): Promise<{ items: ContactMessage[]; total: number; page: number; limit: number; totalPages: number }> {
+  const { data } = await client.get('/admin/contact-messages', { params })
+  return data
+}
+
+export async function adminUpdateContactStatus(id: string, status: 'NEW' | 'READ') {
+  const { data } = await client.patch(`/admin/contact-messages/${id}/status`, { status })
+  return data as { item: ContactMessage }
 }

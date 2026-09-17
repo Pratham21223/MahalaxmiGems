@@ -3,12 +3,13 @@ import { Category } from '../models/Category.js'
 import { Product } from '../models/Product.js'
 import { Order } from '../models/Order.js'
 import { validate } from '../middlewares/validate.js'
-import { categorySchema, productSchema, orderStatusSchema } from '../schemas.js'
+import { categorySchema, productSchema, orderStatusSchema, labReportStatusSchema } from '../schemas.js'
 import { releaseInventory } from '../utils/inventory.js'
 
 export const validateCategory = validate(categorySchema)
 export const validateProduct = validate(productSchema)
 export const validateOrderStatus = validate(orderStatusSchema)
+export const validateLabReportStatus = validate(labReportStatusSchema)
 
 function categoryDoc(c) {
   return { ...c, id: c._id }
@@ -162,6 +163,18 @@ export async function adminUpdateOrderStatus(req, res) {
     return res.json({ item: order })
   }
   order.transitionTo(status)
+  await order.save()
+  res.json({ item: order })
+}
+
+export async function adminUpdateLabReportStatus(req, res) {
+  const order = await Order.findOne({ reference: req.params.reference })
+  if (!order) return res.status(404).json({ error: 'Order not found' })
+  if (!order.labReport?.lab) {
+    return res.status(400).json({ error: 'This order has no lab report request' })
+  }
+  const { status } = res.locals.validated
+  order.labReport.status = status
   await order.save()
   res.json({ item: order })
 }

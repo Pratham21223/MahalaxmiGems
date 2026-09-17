@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { LAB_IDS } from './config/labReports.js'
 
 // Allow-list input schemas (backend-principles.md). All write endpoints validate
 // against these before touching the database.
@@ -47,6 +48,27 @@ export const checkoutSchema = z.object({
     .array(z.object({ productId: z.string().min(1), qty: z.number().int().min(1).max(99) }))
     .max(100)
     .optional(),
+  // Optional laboratory report choice; the server resolves the label/fee from
+  // config (never trusts client-supplied pricing).
+  labReport: z.object({ lab: z.enum(LAB_IDS) }).optional(),
+})
+
+export const contactSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required').max(80),
+  email: z.string().trim().email('A valid email is required').max(120),
+  phone: z.string().trim().max(20).optional().default(''),
+  subject: z.string().trim().min(1, 'Subject is required').max(60),
+  message: z.string().trim().min(1, 'Message is required').max(2000),
+  // Honeypot: hidden from people, filled by bots. Never rejected outright.
+  website: z.string().max(200).optional().default(''),
+})
+
+export const contactStatusSchema = z.object({
+  status: z.enum(['NEW', 'READ']),
+})
+
+export const labReportStatusSchema = z.object({
+  status: z.enum(['REQUESTED', 'SENT_TO_LAB', 'REPORT_RECEIVED']),
 })
 
 export const categorySchema = z.object({

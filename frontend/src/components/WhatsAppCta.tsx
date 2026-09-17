@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom'
 import { MessageCircle, ArrowRight } from 'lucide-react'
+import { waLink } from '@/lib/businessInfo'
 
-const TEXT = encodeURIComponent(
-  "Hi Mahalaxmi Gems! I'd like some help choosing a gemstone.",
-)
+const TEXT = "Hi Mahalaxmi Gems! I'd like some help choosing a gemstone."
 
 export function WhatsAppCta() {
   return (
@@ -16,7 +15,7 @@ export function WhatsAppCta() {
       </p>
       <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
         <a
-          href={`https://wa.me/?text=${TEXT}`}
+          href={waLink(TEXT)}
           target="_blank"
           rel="noreferrer"
           className="focus-ring inline-flex items-center gap-2 rounded-full bg-[#25D366] px-7 py-3 font-medium text-white transition hover:-translate-y-0.5 hover:brightness-105"
