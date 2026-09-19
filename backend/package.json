@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
+    "build": "node --check src/server.js",
     "seed": "node src/seeds/index.js",
     "seed:catalog": "node src/seeds/seedInventory.js",
     "lint": "node --check src/server.js",

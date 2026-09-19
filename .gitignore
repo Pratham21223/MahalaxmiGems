@@ -8,11 +8,13 @@ frontend/dist/
 backend/dist/
 
 docs/*
+!docs/deployment.md
 
 # Environment files (never commit secrets)
 .env
 .env.*
 !.env.example
+!.env.production.example
 
 # Local real inventory imports
 backend/src/seeds/inventory/inventory.local.js

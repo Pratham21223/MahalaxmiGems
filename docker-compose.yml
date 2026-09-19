@@ -1,0 +1,43 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mahalaxmi-gems-app
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - MONGODB_URI=mongodb://mongo:27017/gemstone_store
+      - SESSION_SECRET=change-this-to-a-secure-random-secret-in-production
+      - CORS_ORIGIN=http://localhost:4000
+      - LOG_LEVEL=info
+      # - RAZORPAY_KEY_ID=
+      # - RAZORPAY_KEY_SECRET=
+      # - RAZORPAY_WEBHOOK_SECRET=
+      # - ADMIN_EMAIL=admin@example.com
+      # - ADMIN_PASSWORD=ChangeThisPassword123!
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  mongo:
+    image: mongo:7
+    container_name: mahalaxmi-gems-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  mongo_data:
+

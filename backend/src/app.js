@@ -7,6 +7,12 @@ import session from 'express-session'
 import MongoStore from 'connect-mongo'
 import morgan from 'morgan'
 import express from 'express'
+import path from 'node:path'
+import fs from 'node:fs'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const clientDist = path.resolve(__dirname, '../../frontend/dist')
 
 import { attachUser } from './middlewares/auth.js'
 import { globalLimiter } from './middlewares/rateLimiter.js'
@@ -113,6 +119,18 @@ export function createApp() {
   app.use('/api/admin', adminRouter)
   app.use('/api/labs', labsRouter)
   app.use('/api/contact', contactRouter)
+
+  // In production (e.g. Docker container or standalone Node server),
+  // serve frontend static assets if the built frontend dist exists.
+  if (fs.existsSync(clientDist)) {
+    app.use(express.static(clientDist))
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api') || req.path === '/health') {
+        return next()
+      }
+      res.sendFile(path.join(clientDist, 'index.html'))
+    })
+  }
 
   app.use(notFound)
   app.use(errorHandler)
